@@ -1,0 +1,24 @@
+{
+  "name": "estocks",
+  "version": "1.0.0",
+  "description": "Projeto de Estagio",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/P3dr7/Estocks.git"
+  },
+  "author": "Pedro Henrique Ferri",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/P3dr7/Estocks/issues"
+  },
+  "homepage": "https://github.com/P3dr7/Estocks#readme",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "pg": "^8.11.5"
+  }
+}
