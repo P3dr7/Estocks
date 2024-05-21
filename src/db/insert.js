@@ -1,4 +1,4 @@
-import { query } from './db.js';
+import { pool } from './db.js';
 
 export async function inserirProduto(nome, tamanho, cor) {
   const queryText = `
@@ -9,7 +9,7 @@ export async function inserirProduto(nome, tamanho, cor) {
   const values = [nome, tamanho, cor];
 
   try {
-    const result = await query(queryText, values);
+    const result = await pool.query(queryText, values);
     console.log('Produto inserido:', result.rows[0]);
   } catch (error) {
     console.error('Erro ao inserir produto:', error);
