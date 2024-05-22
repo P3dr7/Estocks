@@ -21,15 +21,20 @@ const { nome, tamanho, cor } = request.body;
 
 export async function inserirLote(request, reply) {
   const { precoProduto, quantidadeProduto, nomeProduto, NLote } = request.body;
+    // console.log('precoProduto:', precoProduto)
+    // console.log('quantidadeProduto:', quantidadeProduto)
+    // console.log('nomeProduto:', nomeProduto)
+    // console.log('NLote:', NLote)
 
   try {    
     const idProduto = await verificaProdutoExiste(nomeProduto);
+    console.log('idProduto:', idProduto)
     if(!idProduto){
       throw new Error('Produto não encontrado');
     }
     const queryText = `
-      INSERT INTO lotes (id_produto, preco_produto, quantidade_produto, nome_produto, n)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO lote_produto (id_produto, preco_produto, quantidade_produto, nome_produto, n_lote)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *;
     `;
     const values = [idProduto, precoProduto, quantidadeProduto, nomeProduto, NLote];

@@ -19,7 +19,7 @@ CREATE TABLE Produtos (
 CREATE TABLE Lote_Produto (
     id_lote_produto SERIAL PRIMARY KEY,
     id_produto INT NOT NULL,
-    preco_produto NUMERIC(10, 2) NOT NULL,
+    preco_produto MONEY NOT NULL,
     quantidade_produto NUMERIC(10, 2) NOT NULL,
     nome_produto VARCHAR(100) NOT NULL,
     n_lote VARCHAR(50),

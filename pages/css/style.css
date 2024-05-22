@@ -1,0 +1,16 @@
+*{
+    margin: 0;
+}
+
+html,body{
+    height: 100%;
+}
+
+.form-container{
+    max-width: 350px;
+    padding: 1rem;
+}
+
+img{
+    border-radius: 25%;
+}
