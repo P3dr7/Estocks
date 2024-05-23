@@ -17,7 +17,7 @@ export async function initializeDatabase() {
 
             const client = await pool.connect();
             const res = await client.query('SELECT * FROM usuarios');
-            console.log(res.rows);
+            // console.log(res.rows);
             client.release();
         } catch (err) {
             console.error("Erro ao estabelecer a conexão ou executar a consulta:", err.message);
