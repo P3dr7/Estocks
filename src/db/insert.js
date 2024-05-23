@@ -24,6 +24,7 @@ export async function inserirProduto(nome, tamanho, cor) {
 }
 
 export async function inserirLote(
+  idProduto,
 	precoProduto,
 	quantidadeProduto,
 	nomeProduto,
@@ -35,8 +36,6 @@ export async function inserirLote(
 	// console.log('NLote:', NLote)
 
 	try {
-		const idProduto = await verificaProdutoExiste(nomeProduto);
-		console.log("idProduto:", idProduto);
 		if (!idProduto) {
 			throw new Error("Produto não encontrado");
 		}

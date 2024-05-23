@@ -35,3 +35,21 @@ export async function verificaProdutoExiste(nome_produto) {
         throw error;
     }
 }
+
+export async function recuperaNLote() {
+    try {
+        const resultLote = await pool.query(
+            "SELECT * FROM lote_produto ORDER BY n_lote DESC LIMIT 1"
+        );
+
+        const NLote = resultLote.rows.length > 0;
+        if (NLote) {
+            return resultLote.rows[0].n_lote;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("Erro ao verificar o produto:", error);
+        throw error;
+    }
+}

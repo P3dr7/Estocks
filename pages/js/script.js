@@ -45,7 +45,7 @@ function validarForm(event) {
 document.getElementById("produtoForm").addEventListener("submit", enviaProduto);
 
 async function enviaProduto(event) {
-	event.preventDefault(); // Impede o envio padrão do formulário
+		event.preventDefault(); // Impede o envio padrão do formulário
 
 	const nomeProduto = document.getElementById("floatingNomeProduto").value;
 	const tamanhoProduto = document.getElementById(
@@ -56,16 +56,14 @@ async function enviaProduto(event) {
 	const quantidadeProduto = document.getElementById(
 		"floatingQuantidadeProduto"
 	).value;
-	const NLote = document.getElementById("floatingNLote").value;
 
 	const dados = {
 		tamanho: tamanhoProduto,
 		cor: corProduto,
 		precoProduto,
 		quantidadeProduto,
-		nome_produto: nomeProduto,
-		NLote,
-		// tamanho, cor, precoProduto, quantidadeProduto, nomeProduto, NLote
+		nomeProduto,
+		// tamanho, cor, precoProduto, quantidadeProduto, nomeProduto
 	};
 
 	console.log("Dados a serem enviados:", JSON.stringify(dados));
@@ -84,16 +82,12 @@ async function enviaProduto(event) {
 		}
 
 		const data = await response.json();
-		console.log("Dados do backend:", data);
+		// console.log("Dados do backend:", data);
 
 		if (data.produto) {
-
 			alert("Produto Inserido Com Sucesso");
-
 		} else if (!data.produto) {
-
 			alert("Produto Não foi Inserido.");
-
 		} else {
 			throw new Error("Erro na solicitação da API");
 		}
