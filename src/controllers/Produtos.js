@@ -1,5 +1,5 @@
 import { inserirLote, inserirProduto } from "../db/insert.js";
-import { recuperaNLote, verificaProdutoExiste } from "./verifica.js";
+import { recuperaNLote, verificaProdutoExiste, recuperaLoteProdutos } from "./verifica.js";
 
 export async function juncaoProdutoLote(request, reply) {
 	const { tamanho, cor, precoProduto, quantidadeProduto, nomeProduto } = request.body;
@@ -18,6 +18,7 @@ export async function juncaoProdutoLote(request, reply) {
 		// Se o produto não existir, insere um novo produto
 		if (!produtoExistente) {
 			produto = await inserirProduto(nomeProduto, tamanho, cor);
+			produto = produto.id_produto;
 			// console.log("Produto inserido:", produto)
 		} else {
 			produto = { id: produtoExistente }; 
@@ -46,5 +47,20 @@ export async function juncaoProdutoLote(request, reply) {
 	} catch (error) {
 		console.error("Erro ao inserir produto:", error);
 		reply.status(500).send({ error: "Erro ao processar a solicitação" });
+	}
+}
+
+export async function recuperaLotesProdutos(){
+	try {
+		const loteProdutos = await recuperaLoteProdutos();
+		// console.log(loteProdutos)
+		if (!loteProdutos) {
+			return { lote: false };
+		} else {
+			return { produtos: loteProdutos };
+		}
+	} catch (error) {
+		console.error("Erro ao verificar o produto:", error);
+		throw error;
 	}
 }

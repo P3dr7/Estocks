@@ -53,3 +53,55 @@ export async function recuperaNLote() {
         throw error;
     }
 }
+
+// export async function recuperaProdutos(){
+//     try {
+//         const resultProdutos = await pool.query(
+//             "SELECT * FROM produtos"
+//         );
+
+//         const Produtos = resultProdutos.rows.length > 0;
+//         if (Produtos) {
+//             return Produtos.rows;
+//         } else {
+//             return null;
+//         }
+//     } catch (error) {
+//         console.error("Erro ao verificar o produto:", error);
+//         throw error;
+//     }
+// }
+
+// export async function recuperaLote(){
+//     try {
+//         const resultLote = await pool.query(
+//             "SELECT * FROM lote_produto"
+//         );
+//         const Lote = resultLoteProduto.rows.length > 0;
+//         if (Lote) {
+//             return Lote.rows;
+//         } else {
+//             return null;
+//         }
+//     } catch (error) {
+//         console.error("Erro ao verificar o produto:", error);
+//         throw error;
+//     }
+// }
+
+export async function recuperaLoteProdutos(){
+    try {
+        const resultLoteProduto = await pool.query(
+            "SELECT p.id_produto, p.nome_produto, p.tamanho_produto, p.cor_produto, l.id_lote_produto, l.preco_produto, l.quantidade_produto, l.nome_produto AS nome_produto_lote, l.n_lote FROM Produtos p JOIN Lote_Produto l ON p.id_produto = l.id_produto ORDER BY p.nome_produto, l.quantidade_produto");
+        const LoteProduto = resultLoteProduto.rows.length > 0;
+        // console.log(LoteProduto)
+        if (LoteProduto) {
+            return resultLoteProduto.rows;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("Erro ao verificar o produto:", error);
+        throw error;
+    }
+}
