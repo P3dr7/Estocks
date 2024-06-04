@@ -18,11 +18,11 @@ export async function juncaoProdutoLote(request, reply) {
 		// Se o produto não existir, insere um novo produto
 		if (!produtoExistente) {
 			produto = await inserirProduto(nomeProduto, tamanho, cor);
-			produto = produto.id_produto;
+			produto = {id : produto };
 			// console.log("Produto inserido:", produto)
 		} else {
 			produto = { id: produtoExistente }; 
-			// console.log("Produto existente:", produto)
+			console.log("Produto existente:", produto)
 		}
 
 		// Recupera o último número de lote e incrementa

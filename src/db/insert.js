@@ -3,24 +3,27 @@ import { verificaProdutoExiste } from "../controllers/verifica.js";
 
 
 export async function inserirProduto(nome, tamanho, cor) {
-	const queryText = `
-    INSERT INTO produtos (nome_produto, tamanho_produto, cor_produto)
-    VALUES ($1, $2, $3)
-    RETURNING *;
-  `;
+    const queryText = `
+        INSERT INTO produtos (nome_produto, tamanho_produto, cor_produto)
+        VALUES ($1, $2, $3)
+        RETURNING *;
+    `;
 
-	const values = [nome, tamanho, cor];
+    const values = [nome, tamanho, cor];
 
-	try {
-		const result = await pool.query(queryText, values);
-		if (!result) {
-			return false;
-		} else {
-			return true;
-		}
-	} catch (error) {
-		console.error("Erro ao inserir produto:", error);
-	}
+    try {
+        const result = await pool.query(queryText, values);
+        // console.log(result);
+        if (!result || result.rowCount === 0) {
+            return false;
+        } else {
+			// console.log(result.rows[0].id_produto)
+            return result.rows[0].id_produto;
+        }
+    } catch (error) {
+        console.error("Erro ao inserir produto:", error);
+        throw error; 
+    }
 }
 
 export async function inserirLote(
