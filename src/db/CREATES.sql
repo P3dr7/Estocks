@@ -23,5 +23,6 @@ CREATE TABLE Lote_Produto (
     quantidade_produto NUMERIC(10, 2) NOT NULL,
     nome_produto VARCHAR(100) NOT NULL,
     n_lote VARCHAR(50),
+    data_criacao date,
     FOREIGN KEY (id_produto) REFERENCES Produtos(id_produto)
 );

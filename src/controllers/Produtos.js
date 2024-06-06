@@ -1,5 +1,5 @@
 import { inserirLote, inserirProduto } from "../db/insert.js";
-import { recuperaNLote, verificaProdutoExiste, recuperaLoteProdutos } from "./verifica.js";
+import { recuperaNLote, verificaProdutoExiste, recuperaLoteProdutos, obterTimestampBrasilia, recuperaLoteDB, formatarTimestamp, moneyToFloat} from "./verifica.js";
 
 export async function juncaoProdutoLote(request, reply) {
 	const { tamanho, cor, precoProduto, quantidadeProduto, nomeProduto } = request.body;
@@ -26,8 +26,10 @@ export async function juncaoProdutoLote(request, reply) {
 		}
 
 		// Recupera o último número de lote e incrementa
-		const NLoteVelho = await recuperaNLote();
-		const NLote = parseInt(NLoteVelho, 10) + 1;
+		const NLote = await recuperaNLote();
+		// console.log("Número do lote:", NLote);
+	
+		const timeStamp = obterTimestampBrasilia();
 
 		// Insere um novo lote
 		const lote = await inserirLote(
@@ -35,7 +37,8 @@ export async function juncaoProdutoLote(request, reply) {
 			precoProduto,
 			quantidadeProduto,
 			nomeProduto,
-			NLote
+			NLote,
+			timeStamp
 		);
 
 		// Verifica se o lote foi inserido com sucesso
@@ -62,5 +65,38 @@ export async function recuperaLotesProdutos(){
 	} catch (error) {
 		console.error("Erro ao verificar o produto:", error);
 		throw error;
+	}
+}
+
+//Criar funcao pra recuperar lote
+export async function recuperaLote(request, reply){
+	const id = request.params.id;
+    console.log(id);
+
+	try {
+		const lote = await recuperaLoteDB(id);
+		// console.log(lote[0])
+		if (!lote) {
+			reply.send({ lote: false });
+		} else {
+			const horarioCorreto = formatarTimestamp(lote[0].data_criacao);
+
+
+			const preco = moneyToFloat(lote[0].preco_produto)
+
+			const valorLote = preco * parseInt(lote[0].quantidade_produto, 10);
+
+			const lotePronto = {
+				id_lote: lote[0].id_lote_produto,
+				data_fabricacao: horarioCorreto,
+				valorLote,
+				quantidade: lote[0].quantidade_produto,
+			};
+			reply.send({ lotePronto });
+			console.log(lotePronto);
+		}
+	} catch (error) {
+		console.error("Erro ao verificar o produto:", error);
+		reply.status(500).send({ error: "Erro ao processar a solicitação" });
 	}
 }

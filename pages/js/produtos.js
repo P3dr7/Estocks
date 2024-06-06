@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
     // Função que obtém dados dos produtos da API
     const obterProdutos = async () => {
         try {
@@ -24,10 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Função que preenche a tabela de produtos
     const preencherTabela = async () => {
         const produtos = await obterProdutos();
-        const tabela = document.getElementById('produtoList');
+        const tabela = document.getElementById("produtoList");
 
-        produtos.forEach(produto => {
-            const row = document.createElement('tr');
+        produtos.forEach((produto) => {
+            const row = document.createElement("tr");
 
             row.innerHTML = `
                 <td>${produto.nome_produto}</td>
@@ -38,11 +38,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="editarProduto(${produto.id_produto})">Editar</button>
                     <button class="btn btn-info btn-sm" onclick="etapasProduto(${produto.id_produto})">Etapas</button>
-                    <button class="btn btn-info btn-sm" onclick="visualizarLote(${produto.id_produto})">Lote</button>
+                    <button class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#collapse${produto.id_produto}" aria-expanded="false" aria-controls="collapse${produto.id_produto}" onclick="visualizarLote(${produto.id_lote_produto})">Lote</button>
+                </td>
+            `;
+
+            const collapseRow = document.createElement("tr");
+            collapseRow.innerHTML = `
+                <td colspan="6" class="p-0">
+                    <div class="collapse" id="collapse${produto.id_lote_produto}">
+                        <div class="card card-body">
+                            Carregando...
+                        </div>
+                    </div>
                 </td>
             `;
 
             tabela.appendChild(row);
+            tabela.appendChild(collapseRow);
         });
     };
 
@@ -51,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Função para adicionar um novo produto
 const adicionarProduto = () => {
-    window.location.href = 'adicionarProduto.html'; // Redireciona para a página de cadastro de produto
+    window.location.href = "adicionarProduto.html"; // Redireciona para a página de cadastro de produto
 };
 
 // Função para editar um produto existente
@@ -64,4 +76,50 @@ const editarProduto = (id) => {
 const etapasProduto = (id) => {
     // Redireciona para a página de etapas do produto com o ID do produto
     window.location.href = `etapas-produto.html?id=${id}`;
+};
+
+// Função para visualizar o lote do produto
+const visualizarLote = async (id) => {
+    try {
+        const response = await fetch(`http://127.0.0.1:3333/recuperaLote/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        console.log("response", response);
+        const data = await response.json();
+        console.log("data", data);
+        const lote = data.lotePronto;
+        console.log("lote", lote);
+
+        const collapseElement = document.querySelector(`#collapse${id} .card-body`);
+        if (!collapseElement) {
+            console.error(`Elemento collapse#${id} não encontrado.`);
+            return;
+        }
+
+        collapseElement.innerHTML = `
+            <p><strong>ID do Lote:</strong> ${lote.id_lote}</p>
+            <p><strong>Data de Fabricação:</strong> ${lote.data_fabricacao}</p>
+            <p><strong>Valor do Lote:</strong> ${lote.valorLote}</p>
+            <p><strong>Quantidade:</strong> ${lote.quantidade}</p>
+        `;
+
+        // Alterna o colapso ao clicar no botão
+        const collapseElementContainer = document.querySelector(`#collapse${id}`);
+        const collapseInstance = bootstrap.Collapse.getOrCreateInstance(collapseElementContainer);
+        collapseInstance.toggle();
+    } catch (error) {
+        console.error("Erro ao obter lote do produto:", error);
+        const collapseElement = document.querySelector(`#collapse${id} .card-body`);
+        if (collapseElement) {
+            collapseElement.innerHTML = "<p>Erro ao carregar dados do lote.</p>";
+        }
+    }
 };

@@ -31,7 +31,8 @@ export async function inserirLote(
 	precoProduto,
 	quantidadeProduto,
 	nomeProduto,
-	NLote
+	NLote,
+	timeStamp
 ) {
 	// console.log('precoProduto:', precoProduto)
 	// console.log('quantidadeProduto:', quantidadeProduto)
@@ -43,8 +44,8 @@ export async function inserirLote(
 			throw new Error("Produto não encontrado");
 		}
 		const queryText = `
-      INSERT INTO lote_produto (id_produto, preco_produto, quantidade_produto, nome_produto, n_lote)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO lote_produto (id_produto, preco_produto, quantidade_produto, nome_produto, n_lote, data_criacao)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *;
     `;
 		const values = [
@@ -53,6 +54,7 @@ export async function inserirLote(
 			quantidadeProduto,
 			nomeProduto,
 			NLote,
+			timeStamp,
 		];
 		const result = await pool.query(queryText, values);
 

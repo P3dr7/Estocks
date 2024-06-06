@@ -86,8 +86,10 @@ async function enviaProduto(event) {
 
 		if (data.produto) {
 			alert("Produto Inserido Com Sucesso");
+			window.location.href = "produtos.html";
 		} else if (!data.produto) {
 			alert("Produto Não foi Inserido.");
+			window.location.href = "produtos.html";
 		} else {
 			throw new Error("Erro na solicitação da API");
 		}
