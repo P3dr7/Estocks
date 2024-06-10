@@ -1,5 +1,5 @@
 import { verificaLogado } from "./controllers/Login.js";
-import { juncaoProdutoLote, recuperaLotesProdutos, recuperaLote } from "./controllers/Produtos.js";
+import { juncaoProdutoLote, recuperaLotesProdutos, recuperaLote, excluirProduto } from "./controllers/Produtos.js";
 export default function (fastify, options, done) {
 	// POST
 	fastify.post("/verificaLogin", verificaLogado);
@@ -12,6 +12,6 @@ export default function (fastify, options, done) {
 	// PUT
 
 	//DELETE
-
+	fastify.delete("/excluirProduto/:id", excluirProduto);
 	done();
 }

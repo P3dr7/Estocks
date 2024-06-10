@@ -1,5 +1,5 @@
 import { inserirLote, inserirProduto } from "../db/insert.js";
-import { recuperaNLote, verificaProdutoExiste, recuperaLoteProdutos, obterTimestampBrasilia, recuperaLoteDB, formatarTimestamp, moneyToFloat} from "./verifica.js";
+import { recuperaNLote, verificaProdutoExiste, recuperaLoteProdutos, obterTimestampBrasilia, recuperaLoteDB, formatarTimestamp, moneyToFloat, excluirProdutoDB} from "./verifica.js";
 
 export async function juncaoProdutoLote(request, reply) {
 	const { tamanho, cor, precoProduto, quantidadeProduto, nomeProduto } = request.body;
@@ -71,11 +71,11 @@ export async function recuperaLotesProdutos(){
 //Criar funcao pra recuperar lote
 export async function recuperaLote(request, reply){
 	const id = request.params.id;
-    console.log(id);
+    // console.log(id);
 
 	try {
 		const lote = await recuperaLoteDB(id);
-		// console.log(lote[0])
+		console.log(lote)
 		if (!lote) {
 			reply.send({ lote: false });
 		} else {
@@ -97,6 +97,22 @@ export async function recuperaLote(request, reply){
 		}
 	} catch (error) {
 		console.error("Erro ao verificar o produto:", error);
+		reply.status(500).send({ error: "Erro ao processar a solicitação" });
+	}
+}
+
+export async function excluirProduto(request, reply){
+	const idLote = request.params.id;
+	// console.log(idLote);
+	try {
+		const loteExcluido = await excluirProdutoDB(idLote);
+		if (!loteExcluido) {
+			reply.send({ lote: false });
+		} else {
+			reply.send({ lote: true });
+		}
+	} catch (error) {
+		console.error("Erro ao excluir o produto:", error);
 		reply.status(500).send({ error: "Erro ao processar a solicitação" });
 	}
 }

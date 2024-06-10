@@ -115,7 +115,7 @@ export async function recuperaLoteProdutos() {
 // Arrumar
 export async function recuperaLoteDB(id) {
 	try {
-		// console.log("id dentro do recuperaLote", id)
+		console.log("id dentro do recuperaLote", id)
 		const resultLoteProduto = await pool.query(
 			`SELECT 
                 p.id_produto, 
@@ -196,4 +196,18 @@ export function moneyToFloat(moneyValue) {
     const floatValue = parseFloat(numericValue);
 
     return floatValue;
+}
+
+export async function excluirProdutoDB(idLote){
+	try {
+		const result = await pool.query(
+			"DELETE FROM lote_produto WHERE id_lote_produto = $1",
+			[idLote]
+		);
+
+		return result.rowCount > 0;
+	} catch (error) {
+		console.error("Erro ao excluir produto:", error);
+		throw error;
+	}
 }

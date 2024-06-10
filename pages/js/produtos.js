@@ -38,14 +38,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="editarProduto(${produto.id_produto})">Editar</button>
                     <button class="btn btn-info btn-sm" onclick="etapasProduto(${produto.id_produto})">Etapas</button>
-                    <button class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#collapse${produto.id_produto}" aria-expanded="false" aria-controls="collapse${produto.id_produto}" onclick="visualizarLote(${produto.id_lote_produto})">Lote</button>
+                    <button class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#collapse${produto.id_produto}" aria-expanded="false" aria-controls="collapse${produto.id_produto}" onclick="visualizarLote(${produto.id_lote_produto}, ${produto.id_produto})">Lote</button>
+                    <button class="btn btn-danger btn-sm" onclick="excluirProduto(${produto.id_lote_produto})">Excluir</button>
                 </td>
             `;
 
             const collapseRow = document.createElement("tr");
             collapseRow.innerHTML = `
                 <td colspan="6" class="p-0">
-                    <div class="collapse" id="collapse${produto.id_lote_produto}">
+                    <div class="collapse" id="collapse${produto.id_produto}">
                         <div class="card card-body">
                             Carregando...
                         </div>
@@ -79,9 +80,9 @@ const etapasProduto = (id) => {
 };
 
 // Função para visualizar o lote do produto
-const visualizarLote = async (id) => {
+const visualizarLote = async (idLote, idProduto) => {
     try {
-        const response = await fetch(`http://127.0.0.1:3333/recuperaLote/${id}`, {
+        const response = await fetch(`http://127.0.0.1:3333/recuperaLote/${idLote}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -92,15 +93,12 @@ const visualizarLote = async (id) => {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        console.log("response", response);
         const data = await response.json();
-        console.log("data", data);
         const lote = data.lotePronto;
-        console.log("lote", lote);
 
-        const collapseElement = document.querySelector(`#collapse${id} .card-body`);
+        const collapseElement = document.querySelector(`#collapse${idProduto} .card-body`);
         if (!collapseElement) {
-            console.error(`Elemento collapse#${id} não encontrado.`);
+            console.error(`Elemento collapse#${idProduto} não encontrado.`);
             return;
         }
 
@@ -112,14 +110,44 @@ const visualizarLote = async (id) => {
         `;
 
         // Alterna o colapso ao clicar no botão
-        const collapseElementContainer = document.querySelector(`#collapse${id}`);
+        const collapseElementContainer = document.querySelector(`#collapse${idProduto}`);
         const collapseInstance = bootstrap.Collapse.getOrCreateInstance(collapseElementContainer);
         collapseInstance.toggle();
     } catch (error) {
         console.error("Erro ao obter lote do produto:", error);
-        const collapseElement = document.querySelector(`#collapse${id} .card-body`);
+        const collapseElement = document.querySelector(`#collapse${idProduto} .card-body`);
         if (collapseElement) {
             collapseElement.innerHTML = "<p>Erro ao carregar dados do lote.</p>";
         }
+    }
+};
+
+// Função para excluir um produto
+const excluirProduto = async (id) => {
+    try {
+        const response = await fetch(`http://127.0.0.1:3333/excluirProduto/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Se o retorno incluir "lote": true, recarregar a página
+        if (data.lote === true) {
+            window.location.reload();
+        } else {
+            // Recarregar a tabela de produtos após exclusão
+            const tabela = document.getElementById("produtoList");
+            tabela.innerHTML = "";
+            preencherTabela();
+        }
+    } catch (error) {
+        console.error("Erro ao excluir produto:", error);
     }
 };
