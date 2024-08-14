@@ -26,3 +26,15 @@ CREATE TABLE Lote_Produto (
     data_criacao date,
     FOREIGN KEY (id_produto) REFERENCES Produtos(id_produto)
 );
+
+-- Criacao da tabela Etapa
+CREATE TABLE Etapa (
+    Id_Etapa SERIAL PRIMARY KEY,
+    Nome_Etapa VARCHAR(30) NOT NULL,
+    Material_x VARCHAR(30) NOT NULL,
+    Quantidade_Material_x INT NOT NULL,
+    Tempo_Necessario TIME NOT NULL,
+    fk_Produto_Id_Produto INT NOT NULL,
+    CONSTRAINT fk_produto FOREIGN KEY (fk_Produto_Id_Produto) REFERENCES produtos(id_produto)
+);
+

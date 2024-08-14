@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Cadastro de Etapa</title>
+    <link href="./css/style.css" rel="stylesheet">
+</head>
+<body class="d-flex align-items-center py-4 bg-body-tertiary">
+    <main class="w-100 m-auto form-container">
+        <form id="etapaForm" method="POST">
+            <h1 class="h3 d-flex mb-3 fw-normal justify-content-center align-items-center">Cadastro de Etapa</h1>
+            
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="floatingNomeEtapa" placeholder="Nome da Etapa" name="nome_etapa" required>
+                <label for="floatingNomeEtapa">Nome da Etapa</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="floatingMaterial" placeholder="Material Necessário" name="material_x" required>
+                <label for="floatingMaterial">Material Necessário</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="number" class="form-control" id="floatingQuantidadeMaterial" placeholder="Quantidade de Material" name="quantidade_material_x" required>
+                <label for="floatingQuantidadeMaterial">Quantidade de Material</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="time" class="form-control" id="floatingTempoNecessario" placeholder="Tempo Necessário" name="tempo_necessario" required>
+                <label for="floatingTempoNecessario">Tempo Necessário</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="floatingProduto" name="produto_selecionado" disabled>
+                <label for="floatingProduto">Produto Selecionado</label>
+            </div>
+
+            <input type="hidden" name="fk_produto_id_produto" id="produtoId">
+
+            <button id="btnCadastrarEtapa" class="btn btn-outline-primary w-100 py-2" onclick="enviaEtapa(event)">Cadastrar</button>
+            <button class="btn btn-outline-secondary w-100 py-2 mt-2" onclick="voltar()">Voltar</button>
+            <div id="aviso" class="text-danger text-center"></div>
+        </form>
+    </main>
+    <script src="js/script.js"></script>
+    <script>
+        // Função para voltar para a página anterior
+        function voltar() {
+            window.location.href = `produtos.html`;
+        }
+
+        // Preencher o campo do produto automaticamente com base no ID da URL
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const produtoId = urlParams.get('id');
+            
+            if (produtoId) {
+                document.getElementById('produtoId').value = produtoId;
+
+                // Busque as informações do produto com base no ID
+                fetch(`http://127.0.0.1:3333/produto/${produtoId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.nome_produto) {
+                            document.getElementById('floatingProduto').value = `${data.nome_produto} - ${data.cor_produto}`;
+                        } else {
+                            console.error('Produto não encontrado');
+                            document.getElementById('aviso').textContent = 'Produto não encontrado.';
+                        }
+                    })
+                    .catch(error => console.error('Erro ao buscar os dados do produto:', error));
+            } else {
+                console.error('ID do produto não encontrado na URL');
+                document.getElementById('aviso').textContent = 'ID do produto não encontrado na URL.';
+            }
+        });
+
+        // Função para enviar o formulário
+        function enviaEtapa(event) {
+            event.preventDefault();
+
+            const produtoId = document.getElementById('produtoId').value;
+            const nomeEtapa = document.getElementById('floatingNomeEtapa').value;
+            const materialX = document.getElementById('floatingMaterial').value;
+            const quantidadeMaterialX = document.getElementById('floatingQuantidadeMaterial').value;
+            const tempoNecessario = document.getElementById('floatingTempoNecessario').value;
+
+            const etapaData = {
+                fk_produto_id_produto: produtoId,
+                nome_etapa: nomeEtapa,
+                material_x: materialX,
+                quantidade_material_x: quantidadeMaterialX,
+                tempo_necessario: tempoNecessario
+            };
+
+            fetch('http://127.0.0.1:3333/adicionaEtapa', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(etapaData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('aviso').textContent = 'Etapa cadastrada com sucesso!';
+                    document.getElementById('etapaForm').reset();
+                } else {
+                    document.getElementById('aviso').textContent = 'Erro ao cadastrar a etapa.';
+                }
+            })
+            .catch(error => {
+                document.getElementById('aviso').textContent = 'Erro ao enviar o formulário.';
+                console.error('Erro ao enviar o formulário:', error);
+            });
+        }
+    </script>
+</body>
+</html>

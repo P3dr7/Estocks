@@ -79,7 +79,7 @@ const editarProduto = (id) => {
 // Função para ver as etapas de um produto
 const etapasProduto = (id) => {
 	// Redireciona para a página de etapas do produto com o ID do produto
-	window.location.href = `etapas-produto.html?id=${id}`;
+	window.location.href = `etapasProduto.html?id=${id}`;
 };
 
 // Função para visualizar o lote do produto

@@ -67,3 +67,27 @@ export async function inserirLote(
 		console.error("Erro ao inserir produto:", error);
 	}
 }
+
+export async function inserirEtapa (dados) {
+	const {nome_etapa, material_x, quantidade_material_x, tempo_necessario, fk_produto_id_produto} = dados
+	
+	try {
+        await pool.query(`
+            INSERT INTO Etapa (Nome_Etapa, Material_x, Quantidade_Material_x, Tempo_Necessario, fk_Produto_Id_Produto)
+            VALUES ($1, $2, $3, $4, $5)`,
+            [nome_etapa, material_x, quantidade_material_x, tempo_necessario, fk_produto_id_produto]
+        );
+        return({ success: true });
+    } catch (error) {
+        console.error('Erro ao adicionar a etapa:', error);
+        return({ success: false, error: 'Erro ao adicionar a etapa' });
+    }
+}
+
+// {
+// 	fk_produto_id_produto: '5',
+// 	nome_etapa: 'teste',
+// 	material_x: 'madeira',
+// 	quantidade_material_x: '12',
+// 	tempo_necessario: '12:12'
+//   }

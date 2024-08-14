@@ -1,5 +1,6 @@
 import { inserirLote, inserirProduto } from "../db/insert.js";
 import { recuperaNLote, verificaProdutoExiste, recuperaLoteProdutos, obterTimestampBrasilia, recuperaLoteDB, formatarTimestamp, moneyToFloat, excluirProdutoDB} from "./verifica.js";
+import { recuperaProduto } from "../db/consult.js";
 
 export async function juncaoProdutoLote(request, reply) {
 	const { tamanho, cor, precoProduto, quantidadeProduto, nomeProduto } = request.body;
@@ -115,4 +116,12 @@ export async function excluirProduto(request, reply){
 		console.error("Erro ao excluir o produto:", error);
 		reply.status(500).send({ error: "Erro ao processar a solicitação" });
 	}
+}
+
+export async function recuperaProdutobyID(request, reply) {
+	const { id } = request.params;
+
+	const dadosProduto = await recuperaProduto(id)
+	// console.log(dadosProduto)
+	reply.send(dadosProduto)
 }

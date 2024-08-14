@@ -49,6 +49,13 @@
             return urlParams.get(param);
         };
 
+        // Função para converter string de data para objeto Date
+        const convertToDate = (dateString) => {
+            const [datePart, timePart] = dateString.split(', ');
+            const [day, month, year] = datePart.split('/');
+            return new Date(`${year}-${month}-${day}T${timePart}`);
+        };
+
         // Função assíncrona para buscar os dados do produto
         const fetchProductData = async (id) => {
             try {
@@ -60,9 +67,16 @@
                     document.getElementById('tamanho_produto').value = lote.tamanho_produto;
                     document.getElementById('cor_produto').value = lote.cor_produto;
                     document.getElementById('preco_produto').value = lote.preco_produto;
-                    document.getElementById('quantidade_produto').value = lote.quantidade;
+                    document.getElementById('quantidade_produto').value = lote.quantidade_produto;
                     document.getElementById('n_lote').value = lote.n_lote;
-                    document.getElementById('data_criacao').value = new Date(lote.data_fabricacao).toLocaleDateString();
+
+                    // Converter a string de data para um objeto Date
+                    const dataObj = convertToDate(lote.data_fabricacao);
+                    if (!isNaN(dataObj)) {
+                        document.getElementById('data_criacao').value = dataObj.toLocaleDateString();
+                    } else {
+                        console.error('Data inválida:', lote.data_fabricacao);
+                    }
                 } else {
                     console.error('Produto não encontrado');
                 }
