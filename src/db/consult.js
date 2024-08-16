@@ -27,3 +27,12 @@ export async function recuperaEtapasDB(produtoId) {
         throw error;
     }
 }
+
+export async function recuperaEstoque() {
+    try {
+        const { rows } = await pool.query('SELECT * FROM estoque_material ORDER BY Id_Material ASC');
+        return(rows);
+    } catch (error) {
+        return({ error: 'Erro ao buscar os produtos em estoque' });
+    }
+};

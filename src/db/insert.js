@@ -84,10 +84,18 @@ export async function inserirEtapa (dados) {
     }
 }
 
-// {
-// 	fk_produto_id_produto: '5',
-// 	nome_etapa: 'teste',
-// 	material_x: 'madeira',
-// 	quantidade_material_x: '12',
-// 	tempo_necessario: '12:12'
-//   }
+
+export async function inserirEstoque (dados) {
+	const {idMaterial,nomeMaterial, quantidadeMaterial, fkEtapa} = dados
+	console.log('dados:', dados)
+	try {
+		await pool.query(` INSERT INTO estoque_material (id_material, nome_material, quantidade_material, fk_etapa_id_etapa)
+			VALUES ($1, $2, $3, $4)`,
+			[idMaterial, nomeMaterial, quantidadeMaterial, fkEtapa]
+		);
+		return({ success: true });
+	} catch (error) {
+		console.error('Erro ao adicionar o material:', error);
+		return({ success: false, error: 'Erro ao adicionar o material' });
+	}
+}

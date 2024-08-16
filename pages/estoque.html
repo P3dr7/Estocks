@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <title>Produtos em Estoque</title>
+</head>
+<body>
+    <div class="container my-5">
+        <h1 class="mb-4">Produtos em Estoque</h1>
+
+        <div class="d-flex justify-content-between mb-3">
+            <button class="btn btn-primary" onclick="adicionarProduto()">Adicionar Produto</button>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID Material</th>
+                    <th>Nome do Material</th>
+                    <th>Quantidade</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+                <!-- Os produtos serão adicionados dinamicamente aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadProducts();
+        });
+
+        async function loadProducts() {
+            try {
+                const response = await fetch('http://127.0.0.1:3333/estoque'); // URL da sua API para listar o estoque
+                const produtos = await response.json();
+
+                const tableBody = document.getElementById('productTableBody');
+                tableBody.innerHTML = ''; // Limpa a tabela antes de carregar os produtos
+
+                if (produtos.length > 0) {
+                    produtos.forEach(produto => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${produto.id_material}</td>
+                            <td>${produto.nome_material}</td>
+                            <td>${produto.quantidade_material}</td>
+                            <td>
+                                <button class="btn btn-success" onclick="editarProduto(${produto.Id_Material})">Editar</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td colspan="4" class="text-center">Nenhum produto encontrado no estoque.</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar os produtos:', error);
+            }
+        }
+
+        function adicionarProduto() {
+            window.location.href = './adicionarProdEstoque.html'; 
+        }
+
+        function editarProduto(id) {
+            // Lógica para editar produto (pode redirecionar para outra página ou abrir um modal)
+            window.location.href = `/editar-produto?id=${id}`; // Exemplo de redirecionamento para outra página com ID do produto
+        }
+    </script>
+</body>
+</html>

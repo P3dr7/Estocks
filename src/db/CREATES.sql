@@ -38,3 +38,11 @@ CREATE TABLE Etapa (
     CONSTRAINT fk_produto FOREIGN KEY (fk_Produto_Id_Produto) REFERENCES produtos(id_produto)
 );
 
+-- Criacao da tabela Estoque_Material
+CREATE TABLE Estoque_Material (
+    Id_Material SERIAL PRIMARY KEY,
+    Nome_Material VARCHAR(30) NOT NULL,
+    Quantidade_Material INT NOT NULL,
+    fk_Etapa_Id_Etapa INT REFERENCES Etapa(Id_Etapa)
+);
+
