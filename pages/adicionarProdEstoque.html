@@ -36,14 +36,14 @@
             const quantidadeMaterial = document.getElementById('quantidadeMaterial').value;
 
             try {
-                const response = await fetch('/api/estoque', {
+                const response = await fetch('http://127.0.0.1:3333/estoque', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        Nome_Material: nomeMaterial,
-                        Quantidade_Material: quantidadeMaterial
+                        nomeMaterial,
+                        quantidadeMaterial
                     })
                 });
 

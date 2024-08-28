@@ -9,25 +9,52 @@
     <link href="./css/style.css" rel="stylesheet">
 </head>
 <body class="bg-body-tertiary">
-    <div class="container py-4">
-        <h1 class="h3 mb-3 fw-normal text-center">Lista de Produtos</h1>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Nome do Produto</th>
-                    <th scope="col">Tamanho</th>
-                    <th scope="col">Cor</th>
-                    <th scope="col">Preço</th>
-                    <th scope="col">Quantidade</th>
-                    <th scope="col">Ações</th>
-                </tr>
-            </thead>
-            <tbody id="produtoList">
-                <!-- Linhas de produtos serão inseridas aqui dinamicamente -->
-            </tbody>
-        </table>
-        <div class="d-flex justify-content-end">
-            <button id="btnAdicionar" class="btn btn-primary" onclick="adicionarProduto()">Adicionar Produto</button>
+    <div class="d-flex">
+        <!-- Menu Lateral -->
+        <nav class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 250px; min-height: 100vh;">
+            <h4 class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white">Nome Usuario</h4>
+            <hr>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="produtos.html" class="nav-link text-white">Produtos</a>
+                </li>
+                <li>
+                    <a href="configurar_produtos.html" class="nav-link text-white">Configurar Produtos</a>
+                </li>
+                <li>
+                    <a href="etapas.html" class="nav-link text-white">Etapas</a>
+                </li>
+                <li>
+                    <a href="configurar_etapas.html" class="nav-link text-white">Configurar Etapas</a>
+                </li>
+            </ul>
+            <hr>
+            <div>
+                <a href="logout.html" class="nav-link text-danger">Sair</a>
+            </div>
+        </nav>
+
+        <!-- Conteúdo Principal -->
+        <div class="container py-4">
+            <h1 class="h3 mb-3 fw-normal text-center">Lista de Produtos</h1>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Nome do Produto</th>
+                        <th scope="col">Tamanho</th>
+                        <th scope="col">Cor</th>
+                        <th scope="col">Preço</th>
+                        <th scope="col">Quantidade</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="produtoList">
+                    <!-- Linhas de produtos serão inseridas aqui dinamicamente -->
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-end">
+                <button id="btnAdicionar" class="btn btn-primary" onclick="adicionarProduto()">Adicionar Produto</button>
+            </div>
         </div>
     </div>
 
