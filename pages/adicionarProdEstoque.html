@@ -7,27 +7,52 @@
     <title>Adicionar Produto ao Estoque</title>
 </head>
 <body>
-    <div class="container my-5">
-        <h1 class="mb-4">Adicionar Produto ao Estoque</h1>
-
-        <form id="addProductForm">
-            <div class="mb-3">
-                <label for="nomeMaterial" class="form-label">Nome do Material</label>
-                <input type="text" class="form-control" id="nomeMaterial" required>
+    <div class="d-flex">
+        <nav class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 250px; min-height: 100vh;">
+            <h4 class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white">Nome Usuario</h4>
+            <hr>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="produtos.html" class="nav-link text-white">Produtos</a>
+                </li>
+                <li>
+                    <a href="configurar_produtos.html" class="nav-link text-white">Configurar Produtos</a>
+                </li>
+                <li>
+                    <a href="etapas.html" class="nav-link text-white">Etapas</a>
+                </li>
+                <li>
+                    <a href="configurar_etapas.html" class="nav-link text-white">Configurar Etapas</a>
+                </li>
+            </ul>
+            <hr>
+            <div>
+                <a href="logout.html" class="nav-link text-danger">Sair</a>
             </div>
+        </nav>
+        
+        <div class="container my-5">
+            <h1 class="mb-4">Adicionar Produto ao Estoque</h1>
 
-            <div class="mb-3">
-                <label for="quantidadeMaterial" class="form-label">Quantidade</label>
-                <input type="number" class="form-control" id="quantidadeMaterial" required>
-            </div>
+            <form id="addProductForm">
+                <div class="mb-3">
+                    <label for="nomeMaterial" class="form-label">Nome do Material</label>
+                    <input type="text" class="form-control" id="nomeMaterial" required>
+                </div>
 
-            <div class="d-flex justify-content-between">
-                <button type="button" class="btn btn-secondary" onclick="voltarPagina()">Voltar</button>
-                <button type="submit" class="btn btn-primary">Adicionar Produto</button>
-            </div>
-        </form>
+                <div class="mb-3">
+                    <label for="quantidadeMaterial" class="form-label">Quantidade</label>
+                    <input type="number" class="form-control" id="quantidadeMaterial" required>
+                </div>
+
+                <!-- Centralizar os botões "Voltar" e "Adicionar Produto" -->
+                <div class="d-flex justify-content-center">
+                    <button type="button" class="btn btn-secondary me-2" onclick="voltarPagina()">Voltar</button>
+                    <button type="submit" class="btn btn-primary">Adicionar Produto</button>
+                </div>
+            </form>
+        </div>
     </div>
-
     <script>
         document.getElementById('addProductForm').addEventListener('submit', async function(event) {
             event.preventDefault();

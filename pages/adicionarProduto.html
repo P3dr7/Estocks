@@ -5,38 +5,69 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <title>Cadastro de Produto</title>
     <link href="./css/style.css" rel="stylesheet">
 </head>
-<body class="d-flex align-items-center py-4 bg-body-tertiary">
-    <main class="w-100 m-auto form-container">
-        <form id="produtoForm" action="/" method="POST">
-            <h1 class="h3 d-flex mb-3 fw-normal justify-content-center align-items-center">Cadastro de Produto</h1>
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="floatingNomeProduto" placeholder="Nome do Produto" name="nome_produto" required>
-                <label for="floatingNomeProduto">Nome do Produto</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="floatingTamanhoProduto" placeholder="Tamanho do Produto" name="tamanho_produto" required>
-                <label for="floatingTamanhoProduto">Tamanho do Produto</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="floatingCorProduto" placeholder="Cor do Produto" name="cor_produto" required>
-                <label for="floatingCorProduto">Cor do Produto</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="number" step="0.01" class="form-control" id="floatingPrecoProduto" placeholder="Preço do Produto" name="preco_produto" required>
-                <label for="floatingPrecoProduto">Preço do Produto</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="number" class="form-control" id="floatingQuantidadeProduto" placeholder="Quantidade do Produto" name="quantidade_produto" required>
-                <label for="floatingQuantidadeProduto">Quantidade do Produto</label>
-            </div>
-            <button id="btnCadastrar" class="btn btn-outline-primary w-100 py-2" onclick="enviaProduto(event)">Cadastrar</button>
-            <div id="aviso" class="text-danger text-center"></div>
-        </form>
+<body class="d-flex">
+    <nav class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 250px; min-height: 100vh;">
+        <h4 class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white">Nome Usuario</h4>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="produtos.html" class="nav-link text-white">Produtos</a>
+            </li>
+            <li>
+                <a href="configurar_produtos.html" class="nav-link text-white">Configurar Produtos</a>
+            </li>
+            <li>
+                <a href="etapas.html" class="nav-link text-white">Etapas</a>
+            </li>
+            <li>
+                <a href="configurar_etapas.html" class="nav-link text-white">Configurar Etapas</a>
+            </li>
+        </ul>
+        <hr>
+        <div>
+            <a href="logout.html" class="nav-link text-danger">Sair</a>
+        </div>
+    </nav>
+
+    <main class="container-fluid d-flex justify-content-center align-items-center p-4">
+        <div class="w-50">
+            <form id="produtoForm" action="/" method="POST">
+                <h1 class="h3 mb-3 fw-normal text-center">Cadastro de Produto</h1>
+
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="floatingNomeProduto" placeholder="Nome do Produto" name="nome_produto" required>
+                    <label for="floatingNomeProduto">Nome do Produto</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="floatingTamanhoProduto" placeholder="Tamanho do Produto" name="tamanho_produto" required>
+                    <label for="floatingTamanhoProduto">Tamanho do Produto</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="floatingCorProduto" placeholder="Cor do Produto" name="cor_produto" required>
+                    <label for="floatingCorProduto">Cor do Produto</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="number" step="0.01" class="form-control" id="floatingPrecoProduto" placeholder="Preço do Produto" name="preco_produto" required>
+                    <label for="floatingPrecoProduto">Preço do Produto</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="number" class="form-control" id="floatingQuantidadeProduto" placeholder="Quantidade do Produto" name="quantidade_produto" required>
+                    <label for="floatingQuantidadeProduto">Quantidade do Produto</label>
+                </div>
+
+                <button id="btnCadastrar" class="btn btn-outline-primary w-100 py-2" onclick="enviaProduto(event)">Cadastrar</button>
+                <div id="aviso" class="text-danger text-center mt-2"></div>
+            </form>
+        </div>
     </main>
+
     <script src="js/script.js"></script>
 </body>
 </html>
