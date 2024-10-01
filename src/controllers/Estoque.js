@@ -1,5 +1,6 @@
-import { recuperaEstoque } from "../db/consult.js";
+import { recuperaEstoque, recuperaEstoqueById } from "../db/consult.js";
 import { inserirEstoque } from "../db/insert.js";
+import { excluirProdutoEstoqueDB } from "./verifica.js";
 
 export async function getEstoque(request, reply) {
     try {
@@ -11,6 +12,16 @@ export async function getEstoque(request, reply) {
         console.error("Erro ao buscar o estoque:", error);
     }
 };
+
+export async function getEstoqueById(request, reply) {
+    try{
+        const { id } = request.params;
+        const estoque = await recuperaEstoqueById(id);
+        reply.send(estoque);
+    }catch (error) {
+
+    }
+}
 
 export async function postEstoque(request, reply) {
     try {
@@ -40,3 +51,20 @@ export async function postEstoque(request, reply) {
         console.error("Erro ao buscar o estoque:", error);
     }
 }   
+
+export async function excluirProdutoEstoque(request, reply){
+	const { id } = request.params;
+    try {
+        // console.log("ID:", id);
+        const produto = await recuperaEstoqueById(id);
+        if (!produto) {
+            reply.send({ error: "Produto não encontrado" });
+            return;
+        }
+        await excluirProdutoEstoqueDB(id);
+        reply.send({ success: "Produto excluído com sucesso" });
+    } catch (error) {
+        reply.send({ error: "Erro ao excluir o produto" });
+        console.error("Erro ao excluir o produto:", error);
+    }
+}

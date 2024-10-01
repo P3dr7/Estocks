@@ -36,3 +36,12 @@ export async function recuperaEstoque() {
         return({ error: 'Erro ao buscar os produtos em estoque' });
     }
 };
+
+export async function recuperaEstoqueById(Id_Material) {
+    try {
+        const { rows } = await pool.query('SELECT * FROM estoque_material WHERE Id_Material = $1', [Id_Material]);
+        return(rows);
+    } catch (error) {
+        return({ error: 'Erro ao buscar os produtos em estoque' });
+    }
+}

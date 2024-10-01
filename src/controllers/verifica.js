@@ -211,3 +211,17 @@ export async function excluirProdutoDB(idLote){
 		throw error;
 	}
 }
+
+export async function excluirProdutoEstoqueDB(idEstoque){
+	try {
+		const result = await pool.query(
+			"DELETE FROM estoque_material WHERE id_material = $1",
+			[idEstoque]
+		);
+
+		return result.rowCount > 0;
+	} catch (error) {
+		console.error("Erro ao excluir produto:", error);
+		throw error;
+	}
+}

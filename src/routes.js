@@ -2,7 +2,7 @@ import { verificaLogado } from "./controllers/Login.js";
 import { juncaoProdutoLote, recuperaLotesProdutos, recuperaLote, excluirProduto, recuperaProdutobyID } from "./controllers/Produtos.js";
 import { recuperaLoteTeste1 } from "./controllers/Altera.js";
 import { adicionarEtapa, recuperaEtapaDB } from "./controllers/Etapas.js";
-import { getEstoque, postEstoque } from "./controllers/Estoque.js";
+import { getEstoque, postEstoque, getEstoqueById, excluirProdutoEstoque } from "./controllers/Estoque.js";
 
 export default function (fastify, options, done) {
 	// POST
@@ -20,9 +20,11 @@ export default function (fastify, options, done) {
 	fastify.get('/produto/:id', recuperaProdutobyID);
 	fastify.get('/recuperaEtapas/:id', recuperaEtapaDB);
 	fastify.get('/estoque', getEstoque);
+	fastify.get('/estoque/:id', getEstoqueById);
 	// PUT
 
 	//DELETE
 	fastify.delete("/excluirProduto/:id", excluirProduto);
+	fastify.delete('/excluirProdutoEstoque/:id', excluirProdutoEstoque);
 	done();
 }

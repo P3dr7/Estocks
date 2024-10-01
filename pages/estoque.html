@@ -68,17 +68,18 @@
 
                 if (produtos.length > 0) {
                     produtos.forEach(produto => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${produto.id_material}</td>
-                            <td>${produto.nome_material}</td>
-                            <td>${produto.quantidade_material}</td>
-                            <td>
-                                <button class="btn btn-success" onclick="editarProduto(${produto.Id_Material})">Editar</button>
-                            </td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${produto.id_material}</td>
+                        <td>${produto.nome_material}</td>
+                        <td>${produto.quantidade_material}</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" onclick="editarProduto(${produto.id_material})">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="excluirProduto(${produto.id_material})">Excluir</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
                 } else {
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -95,9 +96,42 @@
             window.location.href = './adicionarProdEstoque.html'; 
         }
 
-        function editarProduto(id) {
-            window.location.href = `/editar-produto?id=${id}`; 
-        }
+        const editarProduto = (id) => {
+            // Corrigido para usar o ID passado como parâmetro
+            window.location.href = `editaEstoque.html?id=${id}`;
+        };
+
+        const excluirProduto = async (id) => {
+            try {
+                console.log('Excluindo produto:', id);
+                const response = await fetch(`http://127.0.0.1:3333/excluirProdutoEstoque/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Verifique se a exclusão foi bem-sucedida
+                if (data.success) {
+                    // Se a exclusão for bem-sucedida, recarregar a tabela
+                    console.log("Produto excluído com sucesso.");
+                    window.location.reload(); // Atualiza a página inteira
+                } else {
+                    console.error("Erro ao excluir o produto:", data.error);
+                }
+            } catch (error) {
+                console.error("Erro ao excluir produto:", error);
+            }
+        };
+
+
+
     </script>
 </body>
 </html>
