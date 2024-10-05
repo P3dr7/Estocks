@@ -74,6 +74,10 @@
                                 <td>${etapa.material_x}</td>
                                 <td>${etapa.quantidade_material_x}</td>
                                 <td>${etapa.tempo_necessario}</td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" onclick="editarProduto(${etapa.id_etapa})">Editar</button>
+                                    <button class="btn btn-danger btn-sm" onclick="excluirEtapa(${etapa.id_etapa})">Excluir</button>
+                                </td>
                             `;
                             etapasTableBody.appendChild(row);
                         });
@@ -87,6 +91,40 @@
                 alert('ID do produto não encontrado na URL.');
             }
         });
+
+        const excluirEtapa = async (id) => {
+            try {
+                console.log('Excluindo Etapa:', id);
+                const response = await fetch(`http://127.0.0.1:3333/excluirEtapa/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Verifique se a exclusão foi bem-sucedida
+                if (data.success) {
+                    // Se a exclusão for bem-sucedida, recarregar a tabela
+                    console.log("Produto excluído com sucesso.");
+                    window.location.reload(); // Atualiza a página inteira
+                } else {
+                    console.error("Erro ao excluir o produto:", data.error);
+                }
+            } catch (error) {
+                console.error("Erro ao excluir produto:", error);
+            }
+        };
+
+        const editarProduto = (id) => {
+            // Corrigido para usar o ID passado como parâmetro
+            window.location.href = `editaEstoque.html?id=${id}`;
+        };
 
         function voltarPagina() {
             window.history.back();

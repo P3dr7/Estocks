@@ -225,3 +225,17 @@ export async function excluirProdutoEstoqueDB(idEstoque){
 		throw error;
 	}
 }
+
+export async function excluirEtapaDB(idEtapa){
+	try {
+		const result = await pool.query(
+			"DELETE FROM etapa WHERE id_etapa = $1",
+			[idEtapa]
+		);
+
+		return result.rowCount > 0;
+	} catch (error) {
+		console.error("Erro ao excluir produto:", error);
+		throw error;
+	}
+}

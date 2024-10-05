@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Etapa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<body class="bg-body-tertiary">
+    <div class="d-flex">
+        <!-- Menu Lateral -->
+        <nav class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 250px; min-height: 100vh;">
+            <h4 class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white">
+                <a href="dashboard.html" style="color: inherit; text-decoration: none;">FENI</a>
+            </h4>
+            <hr>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li><a href="dashboard.html" class="nav-link text-white">Dashboard</a></li>
+                <li><a href="produtos.html" class="nav-link text-white">Produtos</a></li>
+                <li><a href="estoque.html" class="nav-link text-white">Estoque</a></li>
+            </ul>
+            <hr>
+            <div><a href="logout.html" class="nav-link text-danger">Sair</a></div>
+        </nav>
+
+        <!-- Conteúdo Principal -->
+        <div class="container my-5">
+            <h1>Editar Etapa</h1>
+            <form id="etapa-form">
+                <div class="form-group">
+                    <label for="nome_etapa">Nome da Etapa</label>
+                    <input type="text" class="form-control" id="nome_etapa" name="nome_etapa">
+                </div>
+                <div class="form-group">
+                    <label for="material_x">Material</label>
+                    <input type="text" class="form-control" id="material_x" name="material_x">
+                </div>
+                <div class="form-group">
+                    <label for="quantidade_material_x">Quantidade de Material</label>
+                    <input type="number" class="form-control" id="quantidade_material_x" name="quantidade_material_x">
+                </div>
+                <div class="form-group">
+                    <label for="tempo_necessario">Tempo Necessário (minutos)</label>
+                    <input type="number" class="form-control" id="tempo_necessario" name="tempo_necessario">
+                </div>
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary mt-2">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const etapaId = new URLSearchParams(window.location.search).get('id');
+
+        // Função para buscar dados da etapa
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (etapaId) {
+                try {
+                    const response = await fetch(`http://127.0.0.1:3333/recuperaEtapa/${etapaId}`);
+                    const data = await response.json();
+
+                    if (data) {
+                        // Preenche o formulário com os dados da etapa
+                        document.getElementById('nome_etapa').value = data.nome_etapa;
+                        document.getElementById('material_x').value = data.material_x;
+                        document.getElementById('quantidade_material_x').value = data.quantidade_material_x;
+                        document.getElementById('tempo_necessario').value = data.tempo_necessario;
+                    } else {
+                        alert('Etapa não encontrada.');
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar dados da etapa:', error);
+                }
+            } else {
+                alert('ID da etapa não encontrado na URL.');
+            }
+        });
+
+        // Função para manipular o envio do formulário
+        document.getElementById('etapa-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const updatedEtapa = {
+                id_etapa: etapaId,
+                nome_etapa: document.getElementById('nome_etapa').value,
+                material_x: document.getElementById('material_x').value,
+                quantidade_material_x: document.getElementById('quantidade_material_x').value,
+                tempo_necessario: document.getElementById('tempo_necessario').value
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:3333/atualizaEtapa', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedEtapa)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Etapa atualizada com sucesso!');
+                } else {
+                    alert('Erro ao atualizar a etapa.');
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar a etapa:', error);
+            }
+        });
+    </script>
+</body>
+</html>

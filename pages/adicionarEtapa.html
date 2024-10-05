@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Cadastro de Etapa</title>
     <link href="./css/style.css" rel="stylesheet">
 </head>
@@ -39,15 +39,22 @@
                     <label for="floatingNomeEtapa">Nome da Etapa</label>
                 </div>
 
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="floatingMaterial" placeholder="Material Necessário" name="material_x" required>
-                    <label for="floatingMaterial">Material Necessário</label>
+                <!-- Div onde os materiais serão adicionados -->
+                <div id="materiaisContainer">
+                    <div class="material-group d-flex align-items-start mb-3">
+                        <div class="flex-grow-1">
+                            <select class="form-select" name="material_x[]" required onchange="atualizaSelects()">
+                                <option value="" disabled selected>Selecione um material</option>
+                            </select>
+                            <label>Material Necessário</label>
+
+                            <input type="number" class="form-control mt-2" placeholder="Quantidade de Material" name="quantidade_material_x[]" required>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger ms-3" onclick="removerMaterial(this)">X</button>
+                    </div>
                 </div>
 
-                <div class="form-floating mb-3">
-                    <input type="number" class="form-control" id="floatingQuantidadeMaterial" placeholder="Quantidade de Material" name="quantidade_material_x" required>
-                    <label for="floatingQuantidadeMaterial">Quantidade de Material</label>
-                </div>
+                <button type="button" class="btn btn-outline-secondary mb-3" id="adicionarMaterial">Adicionar outro material</button>
 
                 <div class="form-floating mb-3">
                     <input type="time" class="form-control" id="floatingTempoNecessario" placeholder="Tempo Necessário" name="tempo_necessario" required>
@@ -78,11 +85,111 @@
             window.location.href = `produtos.html`;
         }
 
+        // Função para adicionar um novo campo de material
+        document.getElementById('adicionarMaterial').addEventListener('click', function() {
+            const materiaisContainer = document.getElementById('materiaisContainer');
+            
+            const materialGroup = document.createElement('div');
+            materialGroup.classList.add('material-group', 'd-flex', 'align-items-start', 'mb-3');
+            
+            materialGroup.innerHTML = `
+                <div class="flex-grow-1">
+                    <select class="form-select" name="material_x[]" required onchange="atualizaSelects()">
+                        <option value="" disabled selected>Selecione um material</option>
+                    </select>
+                    <label>Material Necessário</label>
+                    <input type="number" class="form-control mt-2" placeholder="Quantidade de Material" name="quantidade_material_x[]" required>
+                </div>
+                <button type="button" class="btn btn-outline-danger ms-3" onclick="removerMaterial(this)">X</button>
+            `;
+            
+            materiaisContainer.appendChild(materialGroup);
+            
+            // Preenche os materiais disponíveis no novo select, mas sem valor pré-selecionado
+            preencheMateriais();
+            atualizaSelects(); // Atualiza as opções de cada select após adicionar um novo
+        });
+
+
+
+
+        // Preencher os materiais disponíveis no estoque
+        function preencheMateriais() {
+            fetch('http://127.0.0.1:3333/estoque')
+                .then(response => response.json())
+                .then(data => {
+                    const selects = document.querySelectorAll('select[name="material_x[]"]');
+                    // console.log("select prencher materiais", selects)
+
+                    selects.forEach(select => {
+                        const selectedValue = select.value; // Valor selecionado
+                        
+                        // Limpa as opções existentes
+                        select.innerHTML = '<option value="" disabled selected>Selecione um material</option>';
+                        
+                        // Adiciona as opções de materiais
+
+                        // Mexer aqui, para resolver o problema que esta encontrando nas opcoes....
+                        
+                        data.forEach(material => {
+                            const option = document.createElement('option');
+                            option.value = material.id;
+                            option.textContent = `${material.nome_material} - ${material.quantidade_disponivel} unidades`;
+                            
+                            select.appendChild(option);
+                        });
+
+                        if (selectedValue) {
+                            select.value = selectedValue; // Mantém o valor selecionado
+                        }
+                    });
+                    
+                    atualizaSelects(); // Desabilita as opções duplicadas após preencher
+                })
+                .catch(error => console.error('Erro ao buscar os materiais do estoque:', error));
+        }
+
+
+        // Atualiza os selects para evitar seleção duplicada
+        function atualizaSelects() {
+            const selects = document.querySelectorAll('.select-material');
+            const selecionados = Array.from(selects)
+                .map(select => select.value)
+                .filter(Boolean); // Lista de valores que já foram selecionados
+            
+                console.log(selecionados)
+
+            selects.forEach(select => {
+                const selectedValue = select.value; // Valor atualmente selecionado do select
+                console.log(selectedValue)
+                // Percorre todas as opções do select
+                Array.from(select.options).forEach(option => {
+                    if (option.value) {
+                        // Desabilita a opção se ela já foi selecionada em outro select
+                        if (selecionados.includes(option.value) && option.value !== selectedValue) {
+                            option.disabled = true;
+                        } else {
+                            option.disabled = false;
+                        }
+                    }
+                });
+            });
+        }
+
+
+        // Função para remover um campo de material
+        function removerMaterial(button) {
+            const materialGroup = button.parentElement;
+            materialGroup.remove();
+            atualizaSelects();  // Recalcula os selects após a remoção
+        }
+
+
         // Preencher o campo do produto automaticamente com base no ID da URL
         document.addEventListener("DOMContentLoaded", function() {
             const urlParams = new URLSearchParams(window.location.search);
             const produtoId = urlParams.get('id');
-            
+
             if (produtoId) {
                 document.getElementById('produtoId').value = produtoId;
 
@@ -102,6 +209,9 @@
                 console.error('ID do produto não encontrado na URL');
                 document.getElementById('aviso').textContent = 'ID do produto não encontrado na URL.';
             }
+
+            // Preenche os materiais ao carregar a página
+            preencheMateriais();
         });
 
         // Função para enviar o formulário
@@ -110,37 +220,33 @@
 
             const produtoId = document.getElementById('produtoId').value;
             const nomeEtapa = document.getElementById('floatingNomeEtapa').value;
-            const materialX = document.getElementById('floatingMaterial').value;
-            const quantidadeMaterialX = document.getElementById('floatingQuantidadeMaterial').value;
+            const materiais = Array.from(document.querySelectorAll('select[name="material_x[]"]')).map(select => select.value);
+            const quantidades = Array.from(document.querySelectorAll('input[name="quantidade_material_x[]"]')).map(input => input.value);
             const tempoNecessario = document.getElementById('floatingTempoNecessario').value;
 
-            const etapaData = {
-                fk_produto_id_produto: produtoId,
-                nome_etapa: nomeEtapa,
-                material_x: materialX,
-                quantidade_material_x: quantidadeMaterialX,
-                tempo_necessario: tempoNecessario
-            };
-
-            fetch('http://127.0.0.1:3333/adicionaEtapa', {
+            fetch('http://127.0.0.1:3333/etapas', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(etapaData)
+                body: JSON.stringify({
+                    fk_produto_id_produto: produtoId,
+                    nome_etapa: nomeEtapa,
+                    materiais: materiais.map((material, index) => ({
+                        material_id: material,
+                        quantidade: quantidades[index]
+                    })),
+                    tempo_necessario: tempoNecessario,
+                }),
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    document.getElementById('aviso').textContent = 'Etapa cadastrada com sucesso!';
-                    document.getElementById('etapaForm').reset();
-                } else {
-                    document.getElementById('aviso').textContent = 'Erro ao cadastrar a etapa.';
-                }
+                console.log('Etapa cadastrada com sucesso:', data);
+                window.location.href = 'produtos.html'; // Redireciona após cadastro
             })
             .catch(error => {
-                document.getElementById('aviso').textContent = 'Erro ao enviar o formulário.';
-                console.error('Erro ao enviar o formulário:', error);
+                console.error('Erro ao cadastrar a etapa:', error);
+                document.getElementById('aviso').textContent = 'Erro ao cadastrar a etapa.';
             });
         }
     </script>
