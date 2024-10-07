@@ -78,103 +78,100 @@
         </div>
     </main>
 
-    <script src="js/script.js"></script>
+    
     <script>
-        // Função para voltar para a página anterior
+        // Função para voltar para a página anterior    
         function voltar() {
             window.location.href = `produtos.html`;
         }
 
-        // Função para adicionar um novo campo de material
-        document.getElementById('adicionarMaterial').addEventListener('click', function() {
-            const materiaisContainer = document.getElementById('materiaisContainer');
-            
-            const materialGroup = document.createElement('div');
-            materialGroup.classList.add('material-group', 'd-flex', 'align-items-start', 'mb-3');
-            
-            materialGroup.innerHTML = `
-                <div class="flex-grow-1">
-                    <select class="form-select" name="material_x[]" required onchange="atualizaSelects()">
-                        <option value="" disabled selected>Selecione um material</option>
-                    </select>
-                    <label>Material Necessário</label>
-                    <input type="number" class="form-control mt-2" placeholder="Quantidade de Material" name="quantidade_material_x[]" required>
-                </div>
-                <button type="button" class="btn btn-outline-danger ms-3" onclick="removerMaterial(this)">X</button>
-            `;
-            
-            materiaisContainer.appendChild(materialGroup);
-            
-            // Preenche os materiais disponíveis no novo select, mas sem valor pré-selecionado
-            preencheMateriais();
-            atualizaSelects(); // Atualiza as opções de cada select após adicionar um novo
+        // Função para atualizar os selects, desabilitando as opções já selecionadas
+        function atualizaSelects() {
+        const selects = document.querySelectorAll('select[name="material_x[]"]');
+        const selecionados = new Set();
+        
+        // Coleta todos os valores já selecionados
+        selects.forEach((select, index) => {
+            const selectedValue = select.value;
+            if (selectedValue) {
+                selecionados.add(selectedValue);
+            }
         });
 
+        // Desabilita as opções já selecionadas nos outros selects
+        selects.forEach((select) => {
+            const opcoes = select.querySelectorAll('option');
+            opcoes.forEach(option => {
+                if (selecionados.has(option.value) && option.value !== select.value) {
+                    option.disabled = true;
+                } else {
+                    option.disabled = false;
+                }
+            });
+        });
+    }
 
-
-
-        // Preencher os materiais disponíveis no estoque
+                
         function preencheMateriais() {
             fetch('http://127.0.0.1:3333/estoque')
                 .then(response => response.json())
                 .then(data => {
                     const selects = document.querySelectorAll('select[name="material_x[]"]');
-                    // console.log("select prencher materiais", selects)
 
                     selects.forEach(select => {
-                        const selectedValue = select.value; // Valor selecionado
+                        const selectedValue = select.value; // Valor selecionado previamente
                         
                         // Limpa as opções existentes
                         select.innerHTML = '<option value="" disabled selected>Selecione um material</option>';
                         
                         // Adiciona as opções de materiais
-
-                        // Mexer aqui, para resolver o problema que esta encontrando nas opcoes....
-                        
                         data.forEach(material => {
                             const option = document.createElement('option');
-                            option.value = material.id;
+                            // console.log(',',option)
+                            //Erro esta aq, Rever logica
+                            option.value = material.nome_material;
+                            // console.log('opcoes', option.value);
                             option.textContent = `${material.nome_material} - ${material.quantidade_disponivel} unidades`;
-                            
                             select.appendChild(option);
                         });
 
+                        // Verifica se há um valor selecionado previamente e o restaura
                         if (selectedValue) {
-                            select.value = selectedValue; // Mantém o valor selecionado
+                            select.value = selectedValue; 
                         }
                     });
                     
-                    atualizaSelects(); // Desabilita as opções duplicadas após preencher
+                    // Atualiza os selects para desabilitar as opções duplicadas
+                    atualizaSelects();
                 })
                 .catch(error => console.error('Erro ao buscar os materiais do estoque:', error));
         }
 
+        // Função para adicionar um novo campo de material
+    document.getElementById('adicionarMaterial').addEventListener('click', function() {
+        const materiaisContainer = document.getElementById('materiaisContainer');
+        
+        const materialGroup = document.createElement('div');
+        materialGroup.classList.add('material-group', 'd-flex', 'align-items-start', 'mb-3');
+        
+        materialGroup.innerHTML = `
+            <div class="flex-grow-1">
+                <select class="form-select" name="material_x[]" required onchange="atualizaSelects()">
+                    <option value="" disabled selected>Selecione um material</option>
+                </select>
+                <label>Material Necessário</label>
+                <input type="number" class="form-control mt-2" placeholder="Quantidade de Material" name="quantidade_material_x[]" required>
+            </div>
+            <button type="button" class="btn btn-outline-danger ms-3" onclick="removerMaterial(this)">X</button>
+        `;
+        
+        materiaisContainer.appendChild(materialGroup);
+        
+        // Preenche os materiais disponíveis no novo select
+        preencheMateriais();
+    });
 
-        // Atualiza os selects para evitar seleção duplicada
-        function atualizaSelects() {
-            const selects = document.querySelectorAll('.select-material');
-            const selecionados = Array.from(selects)
-                .map(select => select.value)
-                .filter(Boolean); // Lista de valores que já foram selecionados
-            
-                console.log(selecionados)
 
-            selects.forEach(select => {
-                const selectedValue = select.value; // Valor atualmente selecionado do select
-                console.log(selectedValue)
-                // Percorre todas as opções do select
-                Array.from(select.options).forEach(option => {
-                    if (option.value) {
-                        // Desabilita a opção se ela já foi selecionada em outro select
-                        if (selecionados.includes(option.value) && option.value !== selectedValue) {
-                            option.disabled = true;
-                        } else {
-                            option.disabled = false;
-                        }
-                    }
-                });
-            });
-        }
 
 
         // Função para remover um campo de material
