@@ -36,8 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>${produto.nome_produto}</td>
                 <td>${produto.tamanho_produto}</td>
                 <td>${produto.cor_produto}</td>
-                <td>${produto.preco_produto}</td>
-                <td>${produto.quantidade_produto}</td>
+				<td>${produto.etapa_atual_produto}</td>
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="editarProduto(${produto.id_produto})">Editar</button>
                     <button class="btn btn-info btn-sm" onclick="etapasProduto(${produto.id_produto})">Etapas</button>
@@ -113,7 +112,8 @@ const visualizarLote = async (idLote, idProduto) => {
 		collapseElement.innerHTML = `
             <p><strong>ID do Lote:</strong> ${lote.id_lote}</p>
             <p><strong>Data de Fabricação:</strong> ${lote.data_fabricacao}</p>
-            <p><strong>Valor do Lote:</strong> ${lote.valorLote}</p>
+			<p><strong>Valor Unitario:</strong> R$${lote.preco_produto}</p>
+            <p><strong>Valor do Lote:</strong> R$${lote.valorLote}</p>
             <p><strong>Quantidade:</strong> ${lote.quantidade}</p>
         `;
 

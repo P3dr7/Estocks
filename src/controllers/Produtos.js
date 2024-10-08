@@ -90,6 +90,7 @@ export async function recuperaLote(request, reply){
 			const lotePronto = {
 				id_lote: lote[0].id_lote_produto,
 				data_fabricacao: horarioCorreto,
+				preco_produto: preco,
 				valorLote,
 				quantidade: lote[0].quantidade_produto,
 			};

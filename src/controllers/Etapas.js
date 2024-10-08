@@ -17,6 +17,7 @@ export async function recuperaEtapaDB(request, reply) {
 
     try {
         const etapas = await recuperaEtapasDB(produtoId);
+        // console.log("etapas", etapas)
         reply.send(etapas);
     } catch (error) {
         console.error('Erro ao buscar as etapas:', error);

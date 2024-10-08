@@ -50,6 +50,8 @@
 
             <div class="d-flex justify-content-between mt-4">
                 <button class="btn btn-secondary" onclick="voltarPagina()">Voltar</button>
+                <button class="btn btn-outline-danger" onclick="voltarEtapa()">Etapa Anterior</button>
+                <button class="btn btn-outline-primary" onclick="proximaEtapa()">Proxima Etapa</button>
                 <button class="btn btn-primary" onclick="adicionarEtapa()">Adicionar Etapa</button>
             </div>
         </div>
@@ -119,6 +121,14 @@
             } catch (error) {
                 console.error("Erro ao excluir produto:", error);
             }
+        };
+
+        const voltarEtapa = () => {
+            // criar funcao para voltar etapa
+        };
+
+        const proximaEtapa = () => {
+            // criar funcao para proxima etapa
         };
 
         const editarProduto = (id) => {

@@ -42,7 +42,13 @@ CREATE TABLE Etapa (
 CREATE TABLE Estoque_Material (
     Id_Material SERIAL PRIMARY KEY,
     Nome_Material VARCHAR(30) NOT NULL,
-    Quantidade_Material INT NOT NULL,
-    fk_Etapa_Id_Etapa INT REFERENCES Etapa(Id_Etapa)
+    Quantidade_Material INT NOT NULL
 );
 
+CREATE TABLE etapa_material (
+    id_material INT,
+    id_etapa INT,
+    PRIMARY KEY (id_material, id_etapa),
+    FOREIGN KEY (id_material) REFERENCES estoque_material(id_material) ON DELETE CASCADE,
+    FOREIGN KEY (id_etapa) REFERENCES etapa(id_etapa) ON DELETE CASCADE
+);
