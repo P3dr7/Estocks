@@ -1,7 +1,7 @@
 import { verificaLogado } from "./controllers/Login.js";
 import { juncaoProdutoLote, recuperaLotesProdutos, recuperaLote, excluirProduto, recuperaProdutobyID } from "./controllers/Produtos.js";
 import { recuperaLoteTeste1 } from "./controllers/Altera.js";
-import { adicionarEtapa, recuperaEtapaDB, excluirEtapa } from "./controllers/Etapas.js";
+import { adicionarEtapa, recuperaEtapaDB, excluirEtapa, atualizaStatusEtapa } from "./controllers/Etapas.js";
 import { getEstoque, postEstoque, getEstoqueById, excluirProdutoEstoque } from "./controllers/Estoque.js";
 
 export default function (fastify, options, done) {
@@ -21,8 +21,10 @@ export default function (fastify, options, done) {
 	fastify.get('/recuperaEtapas/:id', recuperaEtapaDB);
 	fastify.get('/estoque', getEstoque);
 	fastify.get('/estoque/:id', getEstoqueById);
-	// PUT
 
+	// PUT
+	fastify.put("/atualizaStatusEtapa", atualizaStatusEtapa);
+	
 	//DELETE
 	fastify.delete("/excluirProduto/:id", excluirProduto);
 	fastify.delete('/excluirProdutoEstoque/:id', excluirProdutoEstoque);

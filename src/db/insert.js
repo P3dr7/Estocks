@@ -1,5 +1,6 @@
 import { pool } from './Connection.js';
 import { verificaProdutoExiste } from "../controllers/verifica.js";
+import { getMaterialByName } from './consult.js';
 
 
 export async function inserirProduto(nome, tamanho, cor) {
@@ -68,21 +69,55 @@ export async function inserirLote(
 	}
 }
 
-export async function inserirEtapa (dados) {
-	const {nome_etapa, material_x, quantidade_material_x, tempo_necessario, fk_produto_id_produto} = dados
-	
+export async function inserirEtapa(dados) {
+	const { nome_etapa, material, tempo_necessario, fk_produto_id_produto } = dados;
+  
 	try {
-        await pool.query(`
-            INSERT INTO Etapa (Nome_Etapa, Material_x, Quantidade_Material_x, Tempo_Necessario, fk_Produto_Id_Produto)
-            VALUES ($1, $2, $3, $4, $5)`,
-            [nome_etapa, material_x, quantidade_material_x, tempo_necessario, fk_produto_id_produto]
-        );
-        return({ success: true });
-    } catch (error) {
-        console.error('Erro ao adicionar a etapa:', error);
-        return({ success: false, error: 'Erro ao adicionar a etapa' });
-    }
-}
+	  // Inserindo os dados principais da etapa no banco de dados
+	  const inserido = await pool.query(
+		`INSERT INTO Etapa (nome_Etapa, Tempo_Necessario, fk_produto_id_produto)
+		 VALUES ($1, $2, $3)
+		 RETURNING *`,
+		[nome_etapa, tempo_necessario, fk_produto_id_produto]
+	  );
+  
+	  if (inserido.rowCount !== 0) {
+		// Pegando o id_etapa inserido
+		const id_produto = fk_produto_id_produto;
+		const id_etapa = inserido.rows[0].id_etapa;
+  
+		// Referência ao material que foi enviado no objeto
+		const keys = Object.keys(material);
+		// console.log("keys: ", keys);
+  
+		// Substituir forEach por um loop for...of para lidar com await
+		for (const key of keys) {
+		  if (key.startsWith('material')) {
+			const numero = key.replace('material', ''); // Extrair o número do material (ex: 1, 2, 3)
+			const materialNome = material[key]; // Obter o valor do material
+			const quantidade = material[`quantidade${numero}`]; // Buscar a quantidade correspondente
+  
+			// Verificar se o materialX tem o quantidadeX correspondente
+			if (materialNome && quantidade) {
+			  console.log("infos: ", materialNome, quantidade);
+			  // Aqui você chama a função insereMaterialEtapa com await
+			  await insereMaterialEtapa(materialNome, id_etapa, quantidade);
+			} else {
+			  console.log(`Erro: Material ou quantidade não encontrados para ${key}`);
+			}
+		  }
+		}
+  
+		// Chamada para insereProdutoEtapa
+		await insereProdutoEtapa(id_produto, id_etapa);
+	  }
+  
+	  return { success: true };
+	} catch (error) {
+	  console.error('Erro ao adicionar a etapa:', error);
+	  return { success: false, error: 'Erro ao adicionar a etapa' };
+	}
+  }
 
 
 export async function inserirEstoque (dados) {
@@ -97,5 +132,57 @@ export async function inserirEstoque (dados) {
 	} catch (error) {
 		console.error('Erro ao adicionar o material:', error);
 		return({ success: false, error: 'Erro ao adicionar o material' });
+	}
+}
+
+async function insereProdutoEtapa(id_produto, Id_etapa) {
+	try {
+		// console.log('id_produto:', id_produto)
+		// console.log('Id_etapa:', Id_etapa)
+		await pool.query(` INSERT INTO produto_etapa (fk_produto_id_produto, fk_etapa_id_etapa)
+			VALUES ($1, $2)`,
+			[id_produto, Id_etapa]
+		);
+		return({ success: true });
+	} catch (error) {
+		console.error('Erro ao adicionar o material:', error);
+		return({ success: false, error: 'Erro ao adicionar o material' });
+	}
+}
+
+async function insereMaterialEtapa(nome_material, id_etapa, quantidade_gasta, status) {
+	try {
+		const material = await getMaterialByName(nome_material);
+		if (!material) {
+			return({ success: false, error: 'Material não encontrado' });
+		}	
+		
+		const id_material = material[0].id_material;
+		const status = 0;
+		// console.log('id_material:', id_material)
+		await pool.query(` INSERT INTO etapa_material (fk_material_id_material, fk_etapa_id_etapa, quantidade_gasta, status)
+			VALUES ($1, $2, $3, $4)`,
+			[id_material, id_etapa, quantidade_gasta, status]
+		);
+		return({ success: true });
+	} catch (error) {
+		console.error('Erro ao adicionar o material:', error);
+		return({ success: false, error: 'Erro ao adicionar o material' });
+	}
+}
+
+export async function atualizaStatusEtapaDB(dados){
+	try{
+		const { id_etapa, status } = dados;
+		if (status == 1) {
+			await pool.query(`UPDATE etapa_material SET status = 1 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
+			return({ success: true, message: 'Etapa Em Andamento' });
+		} else if (status == 2) {
+			await pool.query(`UPDATE etapa_material SET status = 2 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
+			return({ success: true, message: 'Etapa Concluída' });
+		}
+	}catch(error){
+		console.error('Erro ao atualizar o status da etapa:', error);
+		return({ success: false, error: 'Erro ao atualizar o status da etapa' });
 	}
 }

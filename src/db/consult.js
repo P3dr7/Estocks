@@ -45,3 +45,32 @@ export async function recuperaEstoqueById(Id_Material) {
         return({ error: 'Erro ao buscar os produtos em estoque' });
     }
 }
+
+export async function getMaterialByName(nome_material) {
+    try {
+        const { rows } = await pool.query('SELECT * FROM estoque_material WHERE nome_material = $1', [nome_material]);
+        return(rows);
+    } catch (error) {
+        return({ error: 'Erro ao buscar os produtos em estoque' });
+    }
+}
+
+export async function getEtapaByName(nome_etapa) {
+    try {
+        // console.log("nomeetapa",nome_etapa)
+        const { rows } = await pool.query('SELECT * FROM etapa WHERE nome_etapa = $1', [nome_etapa]);
+        // console.log(rows)
+        return(rows);
+    } catch (error) {
+        return({ error: 'Erro ao buscar os produtos em estoque' });
+    }
+}
+
+export async function getEtapaMaterialByIDEtapa(id_etapa){
+    try {
+        const { rows } = await pool.query('SELECT * FROM etapa_material WHERE fk_etapa_id_etapa = $1', [id_etapa]);
+        return(rows);
+    } catch (error) {
+        return({ error: 'Erro ao buscar os produtos em estoque' });
+    }
+}

@@ -68,3 +68,7 @@ export async function excluirProdutoEstoque(request, reply){
         console.error("Erro ao excluir o produto:", error);
     }
 }
+
+export async function atualizaMaterial(dados) {
+    
+}

@@ -31,11 +31,8 @@ CREATE TABLE Lote_Produto (
 CREATE TABLE Etapa (
     Id_Etapa SERIAL PRIMARY KEY,
     Nome_Etapa VARCHAR(30) NOT NULL,
-    Material_x VARCHAR(30) NOT NULL,
-    Quantidade_Material_x INT NOT NULL,
     Tempo_Necessario TIME NOT NULL,
-    fk_Produto_Id_Produto INT NOT NULL,
-    CONSTRAINT fk_produto FOREIGN KEY (fk_Produto_Id_Produto) REFERENCES produtos(id_produto)
+    fk_Produto_Id_Produto INT NOT NULL
 );
 
 -- Criacao da tabela Estoque_Material
@@ -48,7 +45,21 @@ CREATE TABLE Estoque_Material (
 CREATE TABLE etapa_material (
     id_material INT,
     id_etapa INT,
+    quantidade_gasta INT,
+    status INT,
     PRIMARY KEY (id_material, id_etapa),
     FOREIGN KEY (id_material) REFERENCES estoque_material(id_material) ON DELETE CASCADE,
     FOREIGN KEY (id_etapa) REFERENCES etapa(id_etapa) ON DELETE CASCADE
+);
+
+CREATE TABLE produto_etapa (
+    fk_Produto_id_produto INT,
+    fk_Etapa_id_etapa INT,
+    PRIMARY KEY (fk_Produto_id_produto, fk_Etapa_id_etapa),
+    CONSTRAINT fk_produto
+        FOREIGN KEY (fk_Produto_id_produto) 
+        REFERENCES produtos(id_produto),
+    CONSTRAINT fk_etapa
+        FOREIGN KEY (fk_Etapa_id_etapa) 
+        REFERENCES etapa(id_etapa)
 );
