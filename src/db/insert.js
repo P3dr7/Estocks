@@ -1,7 +1,7 @@
 import { pool } from './Connection.js';
 import { verificaProdutoExiste } from "../controllers/verifica.js";
 import { getMaterialByName } from './consult.js';
-
+import { atualizaQuantidadeMaterial } from "../controllers/Estoque.js";
 
 export async function inserirProduto(nome, tamanho, cor) {
     const queryText = `
@@ -70,54 +70,67 @@ export async function inserirLote(
 }
 
 export async function inserirEtapa(dados) {
-	const { nome_etapa, material, tempo_necessario, fk_produto_id_produto } = dados;
-  
-	try {
-	  // Inserindo os dados principais da etapa no banco de dados
-	  const inserido = await pool.query(
-		`INSERT INTO Etapa (nome_Etapa, Tempo_Necessario, fk_produto_id_produto)
-		 VALUES ($1, $2, $3)
-		 RETURNING *`,
-		[nome_etapa, tempo_necessario, fk_produto_id_produto]
-	  );
-  
-	  if (inserido.rowCount !== 0) {
-		// Pegando o id_etapa inserido
-		const id_produto = fk_produto_id_produto;
-		const id_etapa = inserido.rows[0].id_etapa;
-  
-		// Referência ao material que foi enviado no objeto
-		const keys = Object.keys(material);
-		// console.log("keys: ", keys);
-  
-		// Substituir forEach por um loop for...of para lidar com await
-		for (const key of keys) {
-		  if (key.startsWith('material')) {
-			const numero = key.replace('material', ''); // Extrair o número do material (ex: 1, 2, 3)
-			const materialNome = material[key]; // Obter o valor do material
-			const quantidade = material[`quantidade${numero}`]; // Buscar a quantidade correspondente
-  
-			// Verificar se o materialX tem o quantidadeX correspondente
-			if (materialNome && quantidade) {
-			  console.log("infos: ", materialNome, quantidade);
-			  // Aqui você chama a função insereMaterialEtapa com await
-			  await insereMaterialEtapa(materialNome, id_etapa, quantidade);
+    const { nome_etapa, materiais, tempo_necessario, fk_produto_id_produto } = dados;
+
+    try {
+        // Inserindo os dados principais da etapa no banco de dados
+        const inserido = await pool.query(
+            `INSERT INTO Etapa (nome_etapa, tempo_necessario, fk_produto_id_produto)
+             VALUES ($1, $2, $3)
+             RETURNING *`,
+            [nome_etapa, tempo_necessario, fk_produto_id_produto]
+        );
+		
+        if (inserido.rowCount !== 0) {
+			const id_produto = fk_produto_id_produto;
+			const id_etapa = inserido.rows[0].id_etapa;
+		
+			// Se materiais for um objeto, converte para array
+			const materiaisArray = Array.isArray(materiais) ? materiais : converteMateriaisParaArray(materiais);
+		
+			// Verifica se o array tem materiais válidos
+			if (materiaisArray.length > 0) {
+				for (const material of materiaisArray) {
+					// Desestruturando corretamente o objeto material
+					const { material_id, quantidade } = material;  // Corrigido para 'quantidade'
+		
+					
+					if (material_id && quantidade) {
+						
+						const id_material = material_id;
+						// Inserir material na etapa
+						await insereMaterialEtapa(id_material, id_etapa, quantidade);
+		
+						// Atualizar quantidade do material no estoque
+						const materialAtt = await atualizaQuantidadeMaterial({
+							idMaterial: material_id,  // Certifique-se de passar a chave correta aqui
+							quantidadeMaterial: quantidade  // Corrigido para usar a variável 'quantidade'
+						});
+		
+						if (!materialAtt.success) {
+							console.log(`Erro ao atualizar o estoque para o material ${material_id}`);
+							return { success: false, error: `Erro ao atualizar o estoque para o material ${material_id}` };
+						}
+					}
+				}
 			} else {
-			  console.log(`Erro: Material ou quantidade não encontrados para ${key}`);
+				console.log('Erro: Nenhum material válido encontrado.');
+				return { success: false, error: 'Materiais inválidos' };
 			}
-		  }
+		
+			// Chamada para insereProdutoEtapa
+			await insereProdutoEtapa(id_produto, id_etapa);
 		}
+		
+		
+
+        return { success: true };
+    } catch (error) {
+        console.error('Erro ao adicionar a etapa:', error);
+        return { success: false, error: 'Erro ao adicionar a etapa' };
+    }
+}
   
-		// Chamada para insereProdutoEtapa
-		await insereProdutoEtapa(id_produto, id_etapa);
-	  }
-  
-	  return { success: true };
-	} catch (error) {
-	  console.error('Erro ao adicionar a etapa:', error);
-	  return { success: false, error: 'Erro ao adicionar a etapa' };
-	}
-  }
 
 
 export async function inserirEstoque (dados) {
@@ -150,14 +163,9 @@ async function insereProdutoEtapa(id_produto, Id_etapa) {
 	}
 }
 
-async function insereMaterialEtapa(nome_material, id_etapa, quantidade_gasta, status) {
+async function insereMaterialEtapa(id_material, id_etapa, quantidade_gasta, status) {
 	try {
-		const material = await getMaterialByName(nome_material);
-		if (!material) {
-			return({ success: false, error: 'Material não encontrado' });
-		}	
 		
-		const id_material = material[0].id_material;
 		const status = 0;
 		// console.log('id_material:', id_material)
 		await pool.query(` INSERT INTO etapa_material (fk_material_id_material, fk_etapa_id_etapa, quantidade_gasta, status)
@@ -184,5 +192,18 @@ export async function atualizaStatusEtapaDB(dados){
 	}catch(error){
 		console.error('Erro ao atualizar o status da etapa:', error);
 		return({ success: false, error: 'Erro ao atualizar o status da etapa' });
+	}
+}
+
+export async function atualizaQuantidadeMaterialDB(dados){
+	try{
+		const { idMaterial, quantidade } = dados;
+
+
+		await pool.query(`UPDATE estoque_material SET quantidade_material = $1 WHERE id_material = $2`, [quantidade, idMaterial]);
+		return({ success: true });
+	}catch(error){
+		console.error('Erro ao atualizar a quantidade do material:', error);
+		return({ success: false, error: 'Erro ao atualizar a quantidade do material' });
 	}
 }

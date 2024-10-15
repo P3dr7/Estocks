@@ -127,10 +127,7 @@
                         // Adiciona as opções de materiais
                         data.forEach(material => {
                             const option = document.createElement('option');
-                            // console.log(',',option)
-                            //Erro esta aq, Rever logica
-                            option.value = material.nome_material;
-                            // console.log('opcoes', option.value);
+                            option.value = material.id_material;  // Atribui o ID como valor da opção
                             option.textContent = `${material.nome_material} - ${material.quantidade_material} unidades`;
                             select.appendChild(option);
                         });
@@ -221,7 +218,47 @@
             const quantidades = Array.from(document.querySelectorAll('input[name="quantidade_material_x[]"]')).map(input => input.value);
             const tempoNecessario = document.getElementById('floatingTempoNecessario').value;
 
-            fetch('http://127.0.0.1:3333/etapas', {
+
+            //verificacoes
+            if(!produtoId || !nomeEtapa || !materiais || !quantidades || !tempoNecessario) {
+                document.getElementById('aviso').textContent = 'Preencha todos os campos.';
+                return;
+            }
+            if(materiais.length !== quantidades.length) {
+                document.getElementById('aviso').textContent = 'Preencha a quantidade de todos os materiais.';
+                return;
+            }
+            if(materiais.length === 0) {
+                document.getElementById('aviso').textContent = 'Adicione pelo menos um material.';
+                return;
+            }
+            if(!materiais.every(material => material)) {
+                document.getElementById('aviso').textContent = 'Selecione um material para cada campo.';
+                return;
+            }
+            if(!quantidades.every(quantidade => quantidade)) {
+                document.getElementById('aviso').textContent = 'Preencha a quantidade de material para cada campo.';
+                return;
+            }
+            if(quantidades.some(quantidade => quantidade <= 0)) {
+                document.getElementById('aviso').textContent = 'A quantidade de material deve ser maior que zero.';
+                return;
+            }
+            if(tempoNecessario <= 0) {
+                document.getElementById('aviso').textContent = 'O tempo necessário deve ser maior que zero.';
+                return;
+            }
+            if(!materiais.every((material, index) => materiais.indexOf(material) === index)) {
+                document.getElementById('aviso').textContent = 'Selecione cada material apenas uma vez.';
+                return;
+            }
+            if(!quantidades.every(quantidade => !isNaN(quantidade))) {
+                document.getElementById('aviso').textContent = 'A quantidade de material deve ser um número.';
+                return;
+            }
+
+            ////////////////////////////////////////////////////////////////////////
+            fetch('http://127.0.0.1:3333/adicionaEtapa', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -229,6 +266,7 @@
                 body: JSON.stringify({
                     fk_produto_id_produto: produtoId,
                     nome_etapa: nomeEtapa,
+                    
                     materiais: materiais.map((material, index) => ({
                         material_id: material,
                         quantidade: quantidades[index]

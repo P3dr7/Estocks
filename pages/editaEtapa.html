@@ -59,7 +59,7 @@
                 try {
                     const response = await fetch(`http://127.0.0.1:3333/recuperaEtapa/${etapaId}`);
                     const data = await response.json();
-
+                    // console.log(data)
                     if (data) {
                         // Preenche o formulário com os dados da etapa
                         document.getElementById('nome_etapa').value = data.nome_etapa;
@@ -80,7 +80,7 @@
         // Função para manipular o envio do formulário
         document.getElementById('etapa-form').addEventListener('submit', async function(event) {
             event.preventDefault();
-
+            
             const updatedEtapa = {
                 id_etapa: etapaId,
                 nome_etapa: document.getElementById('nome_etapa').value,

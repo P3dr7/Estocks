@@ -1,14 +1,17 @@
 import { inserirEtapa, atualizaStatusEtapaDB } from "../db/insert.js";
-import { recuperaEtapasDB, getEtapaByName, getEtapaMaterialByIDEtapa } from "../db/consult.js";
+import { recuperaEtapasDB, getEtapaByName } from "../db/consult.js";
 import { excluirEtapaDB} from "./verifica.js";
+
+// import { atualizaStatusEtapaDB } from "../db/insert.js";
+
 
 export async function adicionarEtapa (request, reply) {
 
     const dados = request.body;
-    console.log(dados)
-    const inserido = await inserirEtapa(dados)
-    console.log("inseridos", inserido)
-    reply.send(inserido).status(500)
+    // console.log("dados adicionar etapa", dados);
+
+    const inserido = await inserirEtapa(dados);
+    reply.send(inserido).status(200);
 
 }
 
@@ -64,11 +67,11 @@ export async function atualizaStatusEtapa(request, reply) {
         }
 
         if (status == 1) {
-            console.log(id_etapa, status)
+            // console.log(id_etapa, status)
             await atualizaStatusEtapaDB({ id_etapa, status });
             return reply.code(200).send({ success: true, message: 'Etapa Em Andamento' });
         } else if (status == 2) {
-            console.log(id_etapa, status)
+            // console.log(id_etapa, status)
             await atualizaStatusEtapaDB({ id_etapa, status });
             return reply.code(200).send({ success: true, message: 'Etapa Finalizada com Sucesso' });
         }

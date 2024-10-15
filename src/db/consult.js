@@ -55,6 +55,15 @@ export async function getMaterialByName(nome_material) {
     }
 }
 
+export async function getMaterialById(id_material) {
+    try {
+        const { rows } = await pool.query('SELECT * FROM estoque_material WHERE id_material = $1', [id_material]);
+        return(rows);
+    } catch (error) {
+        return({ error: 'Erro ao buscar os produtos em estoque' });
+    }
+}
+
 export async function getEtapaByName(nome_etapa) {
     try {
         // console.log("nomeetapa",nome_etapa)

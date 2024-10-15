@@ -1,5 +1,5 @@
-import { recuperaEstoque, recuperaEstoqueById } from "../db/consult.js";
-import { inserirEstoque } from "../db/insert.js";
+import { recuperaEstoque, recuperaEstoqueById, getMaterialById } from "../db/consult.js";
+import { inserirEstoque, atualizaQuantidadeMaterialDB } from "../db/insert.js";
 import { excluirProdutoEstoqueDB } from "./verifica.js";
 
 export async function getEstoque(request, reply) {
@@ -71,4 +71,43 @@ export async function excluirProdutoEstoque(request, reply){
 
 export async function atualizaMaterial(dados) {
     
+}
+
+export async function atualizaQuantidadeMaterial(dados) {
+    const { idMaterial, quantidadeMaterial } = dados;
+    // console.log("dados material", dados)
+    try {
+        // Buscar o material pelo ID no banco de dados
+        // console.log("idMaterial", idMaterial)
+
+        const material = await getMaterialById(idMaterial);
+        // console.log("material", material)
+        if (!material || material.length === 0) {
+            throw new Error(`Material com id ${idMaterial} não encontrado.`);
+        }
+
+        const materialAtual = material[0].quantidade_material;
+        // console.log("material atual", materialAtual)
+
+        // Calcular a nova quantidade após a subtração
+        const quantidadeAtualizada = materialAtual - quantidadeMaterial;
+        // console.log("quantidade atualizada", quantidadeAtualizada)
+
+        if (quantidadeAtualizada < 0) {
+            throw new Error(`Quantidade insuficiente no estoque para o material com id ${idMaterial}.`);
+        }
+
+        // Atualizar a quantidade do material no banco de dados
+        const inserido = await atualizaQuantidadeMaterialDB({ idMaterial, quantidade: quantidadeAtualizada });
+        // console.log("inserido", inserido)
+        
+        if (inserido.success) {
+            return { success: true };
+        } else {
+            throw new Error(`Erro ao atualizar a quantidade do material com id ${idMaterial}.`);
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar a quantidade de material:', error.message);
+        return { success: false, error: error.message };
+    }
 }
