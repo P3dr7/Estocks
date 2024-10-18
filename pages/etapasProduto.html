@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="./css/etapas.css" rel="stylesheet">
     <title>Lista de Etapas do Produto</title>
 </head>
 <body class="bg-body-tertiary">
@@ -32,7 +33,7 @@
         <!-- Conteúdo Principal -->
         <div class="container my-5">
             <h1 class="mb-4">Etapas do Produto</h1>
-            
+            <div class="alert alert-info d-none" id="messageBox" role="alert"></div>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -68,19 +69,38 @@
 
                     if (data && data.length > 0) {
                         const etapasTableBody = document.getElementById('etapasTableBody');
+                        let etapaEmAndamento = data.some(etapa => etapa.status === 1); // Verifica se existe uma etapa em andamento
+
                         data.forEach(etapa => {
                             const row = document.createElement('tr');
+
+                            // Adiciona uma cor de fundo para etapas concluídas
+                            if (etapa.status === 2) {
+                                row.classList.add('table-secondary'); // Classe do Bootstrap para cor cinza
+                            }
+
                             row.innerHTML = `
                                 <td>${etapa.id_etapa}</td>
                                 <td>${etapa.nome_etapa}</td>
-                                <td>${etapa.material_x}</td>
-                                <td>${etapa.quantidade_material_x}</td>
+                                <td>${etapa.nome_material}</td>
+                                <td>${etapa.quantidade_gasta}</td>
                                 <td>${etapa.tempo_necessario}</td>
                                 <td>
                                     <button class="btn btn-success btn-sm" onclick="editarProduto(${etapa.id_etapa})">Editar</button>
                                     <button class="btn btn-danger btn-sm" onclick="excluirEtapa(${etapa.id_etapa})">Excluir</button>
                                 </td>
+                                <td class="text-end"> 
+                                    ${etapa.status === 0 ? 
+                                        `<button class="btn btn-primary btn-sm" 
+                                            onclick="iniciarEtapa(${etapa.id_etapa})" 
+                                            ${etapaEmAndamento ? 'disabled' : ''}>Iniciar</button>` : 
+                                        etapa.status === 1 ? 
+                                        `<span class="badge bg-info text-dark">Em Andamento</span>` : 
+                                        `<span class="badge bg-secondary">Concluída</span>`
+                                    }
+                                </td>
                             `;
+
                             etapasTableBody.appendChild(row);
                         });
                     } else {
@@ -135,6 +155,66 @@
             // Corrigido para usar o ID passado como parâmetro
             window.location.href = `editaEstoque.html?id=${id}`;
         };
+
+        const iniciarEtapa = async (id_etapa) => {
+            try {
+                const status = 1;  // Definir o status como "Em Andamento"
+                // console.log("Dados enviados:", { id_etapa, status });
+                // Fazendo a requisição PUT para a rota atualizaStatusEtapa
+                const response = await fetch(`http://127.0.0.1:3333/atualizaStatusEtapa`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id_etapa, status })
+                });
+                console.log(response);
+                // Verificar se a resposta foi bem-sucedida (status HTTP 2xx)
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP! status: ${response.status}`);
+                }
+
+                // Tentar ler a resposta como texto
+                const responseText = await response.text();
+
+                // Definir o local para exibir mensagens
+                const messageBox = document.getElementById('messageBox');
+
+                if (responseText) {
+                    // Tentar converter o texto em JSON, se possível
+                    try {
+                        const data = JSON.parse(responseText);
+
+                        // Exibir a mensagem de sucesso ou erro baseado na resposta
+                        if (data.success) {
+                            messageBox.classList.remove('d-none', 'alert-danger');
+                            messageBox.classList.add('alert-success');
+                            messageBox.textContent = data.message;
+                        } else {
+                            messageBox.classList.remove('d-none', 'alert-success');
+                            messageBox.classList.add('alert-danger');
+                            messageBox.textContent = data.error || "Erro desconhecido.";
+                        }
+                    } catch (jsonError) {
+                        // Se a resposta não for JSON, exibir uma mensagem de erro
+                        throw new Error(`Erro ao interpretar resposta JSON: ${jsonError.message}`);
+                    }
+                } else {
+                    // Caso a resposta do servidor esteja vazia
+                    throw new Error("Resposta vazia do servidor.");
+                }
+
+            } catch (error) {
+                console.error("Erro ao atualizar o status da etapa:", error);
+
+                // Exibir uma mensagem de erro genérica no front-end
+                const messageBox = document.getElementById('messageBox');
+                messageBox.classList.remove('d-none', 'alert-success');
+                messageBox.classList.add('alert-danger');
+                messageBox.textContent = error.message || "Erro ao atualizar o status da etapa.";
+            }
+        };
+
 
         function voltarPagina() {
             window.history.back();

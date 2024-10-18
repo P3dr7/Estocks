@@ -1,0 +1,12 @@
+.table-secondary {
+    background-color: #f8f9fa; /* Cinza claro */
+    color: #6c757d; /* Texto cinza */
+}
+
+.badge.bg-info {
+    background-color: #17a2b8;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d;
+}

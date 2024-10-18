@@ -135,7 +135,7 @@ export async function inserirEtapa(dados) {
 
 export async function inserirEstoque (dados) {
 	const {idMaterial,nomeMaterial, quantidadeMaterial, fkEtapa} = dados
-	console.log('dados:', dados)
+	// console.log('dados:', dados)
 	try {
 		await pool.query(` INSERT INTO estoque_material (id_material, nome_material, quantidade_material, fk_etapa_id_etapa)
 			VALUES ($1, $2, $3, $4)`,

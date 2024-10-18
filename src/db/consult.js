@@ -83,3 +83,31 @@ export async function getEtapaMaterialByIDEtapa(id_etapa){
         return({ error: 'Erro ao buscar os produtos em estoque' });
     }
 }
+
+export async function getEtapaById(id_etapa) {
+    try {
+        const result = await pool.query(
+            "SELECT * FROM etapa e JOIN etapa_material em ON em.fk_etapa_id_etapa = e.id_etapa WHERE id_etapa = $1",
+            [id_etapa]
+        );
+
+        const etapa = result.rows.length > 0;
+        if (etapa) {
+            return result.rows;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Erro ao buscar a etapa:', error);
+        throw error;
+    }
+}
+
+export async function getEtapaMaterialByProdutoId(){
+    try {
+        const { rows } = await pool.query('SELECT e.id_etapa, e.nome_etapa, e.tempo_necessario, em.id_material, em.nome_material, em.quantidade_material, etp.quantidade_gasta, etp.status FROM produto_etapa pe JOIN etapa e ON pe.fk_etapa_id_etapa = e.id_etapa JOIN etapa_material etp ON e.id_etapa = etp.fk_etapa_id_etapa JOIN estoque_material em ON etp.fk_material_id_material = em.id_material WHERE pe.fk_produto_id_produto = 5;  -- Substitua $1 pelo ID do produto`');
+        return(rows);
+    } catch (error) {
+        return({ error: 'Erro ao buscar os produtos em estoque' });
+    }
+}

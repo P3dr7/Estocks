@@ -69,9 +69,6 @@ export async function excluirProdutoEstoque(request, reply){
     }
 }
 
-export async function atualizaMaterial(dados) {
-    
-}
 
 export async function atualizaQuantidadeMaterial(dados) {
     const { idMaterial, quantidadeMaterial } = dados;
@@ -109,5 +106,16 @@ export async function atualizaQuantidadeMaterial(dados) {
     } catch (error) {
         console.error('Erro ao atualizar a quantidade de material:', error.message);
         return { success: false, error: error.message };
+    }
+}
+
+export async function getMaterialByEtapaId(id_etapa){
+    try {
+        
+        const material = await getMaterialByEtapaIdDB();
+        return material;
+    } catch (error) {
+        console.error('Erro ao buscar o material:', error);
+        return { success: false, error: 'Erro ao buscar o material' };
     }
 }
