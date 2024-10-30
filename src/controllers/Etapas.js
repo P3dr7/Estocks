@@ -19,6 +19,7 @@ export async function recuperaEtapaDB(request, reply) {
     const produtoId = request.params.id;
 
     try {
+        console.log("Requisição recebida para buscar as etapas do produto:", produtoId);
         const etapas = await getEtapaMaterialByProdutoId(produtoId);
         // console.log("etapas", etapas)
 
@@ -48,6 +49,8 @@ export async function excluirEtapa(request, reply){
         console.error("Erro ao excluir o produto:", error);
     }
 }
+
+
 
 export async function atualizaStatusEtapa(request, reply) {   
     try {
@@ -81,9 +84,9 @@ export async function atualizaStatusEtapa(request, reply) {
             const materiaisDaEtapa = await getEtapaMaterialByIDEtapa(id_etapa);
             for (const material of materiaisDaEtapa) {
                 console.log("Material:", material);
-                console.log("Finalizando:", material.id_material);
-                await atualizaStatusEtapaDB({ id_material: material.id_material, status });
-                console.log("Material finalizado:", material.id_material);
+                console.log("Finalizando:", material.fk_material_id_material);
+                await atualizaStatusEtapaDB({ id_material: material.fk_material_id_material, status });
+                console.log("Material finalizado:", material.fk_material_id_material);
             }
 
             // Atualiza o status da etapa para "Finalizada" (2)
@@ -94,6 +97,8 @@ export async function atualizaStatusEtapa(request, reply) {
         }
 
         // Se a etapa está com status 0 (pendente) e o novo status é 1, ela será iniciada
+        console.log("Etapa atual:", etapaAtual.status);
+        console.log("Novo status:", status);
         if (etapaAtual.status === 0 && status === 1) {
             console.log("Iniciando etapa:", id_etapa);
 
@@ -116,6 +121,25 @@ export async function atualizaStatusEtapa(request, reply) {
 
             return reply.code(200).send({ success: true, message: 'Etapa Em Andamento com todos os materiais atualizados' });
         }
+
+        if(etapaAtual.status === 1 && status === 0){
+            console.log("Reiniciando etapa:", id_etapa);
+
+            // Buscar todos os materiais relacionados à etapa
+            const materiaisDaEtapa = await getEtapaMaterialByIDEtapa(id_etapa);
+            if (materiaisDaEtapa.length === 0) {
+                console.log("Nenhum material encontrado para esta etapa:", id_etapa);
+                return reply.code(404).send({ success: false, error: 'Nenhum material encontrado para esta etapa' });
+            }
+
+            // Atualiza o status da etapa para "Pendente" (0)
+            await atualizaStatusEtapaDB({ id_etapa, status });
+            
+            console.log("Etapa atualizada para Pendente:", id_etapa);
+
+            return reply.code(200).send({ success: true, message: 'Etapa Reiniciada com todos os materiais atualizados' });
+        }
+
 
     } catch (error) { 
         console.error('Erro ao atualizar o status da etapa:', error);

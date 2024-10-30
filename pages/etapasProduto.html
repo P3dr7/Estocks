@@ -37,6 +37,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
+                        <!-- <th>Selecionar</th> Nova coluna para o checkbox -->
                         <th>ID Etapa</th>
                         <th>Nome da Etapa</th>
                         <th>Material</th>
@@ -72,37 +73,37 @@
                         let etapaEmAndamento = data.some(etapa => etapa.status === 1); // Verifica se existe uma etapa em andamento
 
                         data.forEach(etapa => {
-                            const row = document.createElement('tr');
+                        const row = document.createElement('tr');
 
-                            // Adiciona uma cor de fundo para etapas concluídas
-                            if (etapa.status === 2) {
-                                row.classList.add('table-secondary'); // Classe do Bootstrap para cor cinza
-                            }
+                        // Adiciona uma cor de fundo para etapas concluídas
+                        if (etapa.status === 2) {
+                            row.classList.add('table-warning'); // Classe do Bootstrap para cor cinza
+                        }
 
-                            row.innerHTML = `
-                                <td>${etapa.id_etapa}</td>
-                                <td>${etapa.nome_etapa}</td>
-                                <td>${etapa.nome_material}</td>
-                                <td>${etapa.quantidade_gasta}</td>
-                                <td>${etapa.tempo_necessario}</td>
-                                <td>
-                                    <button class="btn btn-success btn-sm" onclick="editarProduto(${etapa.id_etapa})">Editar</button>
-                                    <button class="btn btn-danger btn-sm" onclick="excluirEtapa(${etapa.id_etapa})">Excluir</button>
-                                </td>
-                                <td class="text-end"> 
-                                    ${etapa.status === 0 ? 
-                                        `<button class="btn btn-primary btn-sm" 
-                                            onclick="iniciarEtapa(${etapa.id_etapa})" 
-                                            ${etapaEmAndamento ? 'disabled' : ''}>Iniciar</button>` : 
-                                        etapa.status === 1 ? 
-                                        `<span class="badge bg-info text-dark">Em Andamento</span>` : 
-                                        `<span class="badge bg-secondary">Concluída</span>`
-                                    }
-                                </td>
-                            `;
+                        row.innerHTML = `
+                            <td>${etapa.id_etapa}</td>    
+                            <td>${etapa.nome_etapa}</td>
+                            <td>${etapa.nome_material}</td>
+                            <td>${etapa.quantidade_gasta}</td>
+                            <td>${etapa.tempo_necessario}</td>
+                            <td>
+                                <button class="btn btn-success btn-sm" onclick="editarProduto(${etapa.id_etapa})">Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="excluirEtapa(${etapa.id_etapa})">Excluir</button>
+                            </td>
+                            <td class="text-end"> 
+                                ${etapa.status === 0 ? 
+                                    `<button class="btn btn-primary btn-sm" 
+                                        onclick="iniciarEtapa(${etapa.id_etapa})" 
+                                ${etapaEmAndamento ? 'disabled' : ''}>Iniciar</button>` : 
+                                    etapa.status === 1 ? 
+                                    `<span class="badge bg-info text-dark">Em Andamento</span>` : 
+                                    `<span class="badge bg-secondary">Concluída</span>`
+                                }
+                            </td>
+                        `;
 
-                            etapasTableBody.appendChild(row);
-                        });
+                        etapasTableBody.appendChild(row);
+                    });
                     } else {
                         alert('Nenhuma etapa encontrada para este produto.');
                     }
@@ -116,7 +117,7 @@
 
         const excluirEtapa = async (id) => {
             try {
-                console.log('Excluindo Etapa:', id);
+                // console.log('Excluindo Etapa:', id);
                 const response = await fetch(`http://127.0.0.1:3333/excluirEtapa/${id}`, {
                     method: "DELETE",
                     headers: {
@@ -143,12 +144,111 @@
             }
         };
 
-        const voltarEtapa = () => {
-            // criar funcao para voltar etapa
+        const voltarEtapa = async () => {
+            // Encontrar a etapa em andamento
+            const etapaEmAndamento = Array.from(document.querySelectorAll('#etapasTableBody tr')).find(row =>
+                row.querySelector('.badge')?.textContent === 'Em Andamento'
+            );
+
+            if (!etapaEmAndamento) {
+                alert('Nenhuma etapa em andamento para voltar.');
+                return;
+            }
+
+            const idEtapa = etapaEmAndamento.querySelector('td').textContent; // ID da etapa
+            const nomeEtapa = etapaEmAndamento.querySelectorAll('td')[1].textContent; // Nome da etapa
+
+            // Exibir confirmação
+            if (!confirm(`Tem certeza que deseja reverter a etapa "${nomeEtapa}" para o estado inicial?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://127.0.0.1:3333/atualizaStatusEtapa`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id_etapa: idEtapa, status: 0 }) // Enviar status "0" para voltar a etapa
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro ao reverter a etapa. Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('A etapa foi revertida com sucesso.');
+                    window.location.reload(); // Atualizar a página para refletir a alteração
+                } else {
+                    console.error(data.error);
+                    alert('Erro ao reverter a etapa.');
+                }
+            } catch (error) {
+                console.error('Erro na requisição para reverter a etapa:', error);
+                alert('Erro ao reverter a etapa.');
+            }
         };
 
-        const proximaEtapa = () => {
-            // criar funcao para proxima etapa
+
+        const proximaEtapa = async () => {
+            const etapasTableBody = document.getElementById('etapasTableBody');
+            const rows = etapasTableBody.querySelectorAll('tr');
+            
+            let etapaEmAndamento = null;
+            let nomeDaEtapa = "";
+
+            // Procura pela etapa em andamento (status === 1)
+            rows.forEach(row => {
+                const statusBadge = row.querySelector('.badge.bg-info'); // Badge para "Em Andamento"
+                if (statusBadge) {
+                    const etapaId = row.querySelector('td').innerText; // Pega o ID da primeira coluna
+                    nomeDaEtapa = row.querySelector('td:nth-child(2)').innerText; // Pega o nome da etapa
+                    etapaEmAndamento = { id: etapaId, status: 1 };
+                }
+            });
+
+            // Verifica se encontrou uma etapa em andamento
+            if (!etapaEmAndamento) {
+                alert("Não há etapa em andamento para atualizar.");
+                return;
+            }
+
+            // Exibe a confirmação para o usuário
+            const confirmacao = confirm(`Tem certeza que quer concluir a etapa "${nomeDaEtapa}"?`);
+
+            if (!confirmacao) {
+                // Se o usuário cancelar, sai da função
+                return;
+            }
+
+            try {
+                // Envia uma requisição PUT para atualizar o status da etapa
+                const response = await fetch(`http://127.0.0.1:3333/atualizaStatusEtapa`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id_etapa: etapaEmAndamento.id, status: 2 }) // Atualiza o status para 2 (Concluída)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert("Etapa atualizada para concluída com sucesso!");
+                    window.location.reload(); // Recarrega a página para refletir a mudança
+                } else {
+                    alert(data.error || "Erro ao atualizar a etapa.");
+                }
+            } catch (error) {
+                console.error("Erro ao atualizar o status da etapa:", error);
+                alert("Erro ao atualizar o status da etapa.");
+            }
         };
 
         const editarProduto = (id) => {
@@ -168,7 +268,7 @@
                     },
                     body: JSON.stringify({ id_etapa, status })
                 });
-                console.log(response);
+                // console.log(response);
                 // Verificar se a resposta foi bem-sucedida (status HTTP 2xx)
                 if (!response.ok) {
                     throw new Error(`Erro HTTP! status: ${response.status}`);
@@ -190,6 +290,7 @@
                             messageBox.classList.remove('d-none', 'alert-danger');
                             messageBox.classList.add('alert-success');
                             messageBox.textContent = data.message;
+                            window.location.reload();
                         } else {
                             messageBox.classList.remove('d-none', 'alert-success');
                             messageBox.classList.add('alert-danger');

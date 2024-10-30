@@ -188,7 +188,12 @@ export async function atualizaStatusEtapaDB(dados){
 		} else if (status == 2) {
 			await pool.query(`UPDATE etapa_material SET status = 2 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
 			return({ success: true, message: 'Etapa Concluída' });
+		} else if (status == 0) {
+			await pool.query(`UPDATE etapa_material SET status = 0 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
+			return({ success: true, message: 'Etapa Reiniciada' });
 		}
+		
+
 	}catch(error){
 		console.error('Erro ao atualizar o status da etapa:', error);
 		return({ success: false, error: 'Erro ao atualizar o status da etapa' });

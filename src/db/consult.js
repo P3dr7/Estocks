@@ -103,9 +103,10 @@ export async function getEtapaById(id_etapa) {
     }
 }
 
-export async function getEtapaMaterialByProdutoId(){
+export async function getEtapaMaterialByProdutoId(id_produto) {
     try {
-        const { rows } = await pool.query('SELECT e.id_etapa, e.nome_etapa, e.tempo_necessario, em.id_material, em.nome_material, em.quantidade_material, etp.quantidade_gasta, etp.status FROM produto_etapa pe JOIN etapa e ON pe.fk_etapa_id_etapa = e.id_etapa JOIN etapa_material etp ON e.id_etapa = etp.fk_etapa_id_etapa JOIN estoque_material em ON etp.fk_material_id_material = em.id_material WHERE pe.fk_produto_id_produto = 5;  -- Substitua $1 pelo ID do produto`');
+        const { rows } = await pool.query('SELECT e.id_etapa, e.nome_etapa, e.tempo_necessario, em.id_material, em.nome_material, em.quantidade_material, etp.quantidade_gasta, etp.status FROM produto_etapa pe JOIN etapa e ON pe.fk_etapa_id_etapa = e.id_etapa JOIN etapa_material etp ON e.id_etapa = etp.fk_etapa_id_etapa JOIN estoque_material em ON etp.fk_material_id_material = em.id_material WHERE pe.fk_produto_id_produto = $1',
+         [id_produto]);
         return(rows);
     } catch (error) {
         return({ error: 'Erro ao buscar os produtos em estoque' });

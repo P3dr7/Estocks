@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const preencherTabela = async () => {
 		const produtos = await obterProdutos();
 		const tabela = document.getElementById("produtoList");
-
+		console.log("produtos", produtos);
 		produtos.forEach((produto) => {
 			const row = document.createElement("tr");
 
