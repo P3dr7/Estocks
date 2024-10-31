@@ -140,6 +140,25 @@ export async function atualizaStatusEtapa(request, reply) {
             return reply.code(200).send({ success: true, message: 'Etapa Reiniciada com todos os materiais atualizados' });
         }
 
+        if (etapaAtual.status == 2 && status == 4) {
+            console.log("Enviando Produto para estoque", id_etapa);
+            
+            // Buscar todos os materiais relacionados à etapa
+            const materiaisDaEtapa = await getEtapaMaterialByIDEtapa(id_etapa);
+            for (const material of materiaisDaEtapa) {
+                console.log("Material:", material);
+                console.log("Estocando:", material.fk_material_id_material);
+                await atualizaStatusEtapaDB({ id_material: material.fk_material_id_material, status });
+                console.log("Material finalizado:", material.fk_material_id_material);
+            }
+
+            // Atualiza o status da etapa para "Finalizada" (2)
+            await atualizaStatusEtapaDB({ id_etapa, status });
+            console.log("Etapa atualizada para Finalizada:", id_etapa);
+
+            return reply.code(200).send({ success: true, message: 'Etapa Finalizada com Sucesso' });
+        }
+
 
     } catch (error) { 
         console.error('Erro ao atualizar o status da etapa:', error);

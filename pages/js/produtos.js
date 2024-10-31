@@ -31,31 +31,36 @@ document.addEventListener("DOMContentLoaded", () => {
 		console.log("produtos", produtos);
 		produtos.forEach((produto) => {
 			const row = document.createElement("tr");
-
+	
+			// Define os botões dependendo da etapa do produto
+			const botoes = (produto.etapa_atual === 4 || produto.etapa_atual === 'Finalizado') 
+				? `<button class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#collapse${produto.id_produto}" aria-expanded="false" aria-controls="collapse${produto.id_produto}" onclick="visualizarLote(${produto.id_lote_produto}, ${produto.id_produto})">Lote</button>`  // Sem botões para produtos finalizados
+				: `
+					<button class="btn btn-warning btn-sm" onclick="editarProduto(${produto.id_produto})">Editar</button>
+					<button class="btn btn-info btn-sm" onclick="etapasProduto(${produto.id_produto})">Etapas</button>
+					<button class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#collapse${produto.id_produto}" aria-expanded="false" aria-controls="collapse${produto.id_produto}" onclick="visualizarLote(${produto.id_lote_produto}, ${produto.id_produto})">Lote</button>
+					<button class="btn btn-danger btn-sm" onclick="excluirProduto(${produto.id_lote_produto})">Excluir</button>
+				`;
+	
 			row.innerHTML = `
-                <td>${produto.nome_produto}</td>
-                <td>${produto.tamanho_produto}</td>
-                <td>${produto.cor_produto}</td>
-				<td>${produto.etapa_atual_produto}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="editarProduto(${produto.id_produto})">Editar</button>
-                    <button class="btn btn-info btn-sm" onclick="etapasProduto(${produto.id_produto})">Etapas</button>
-                    <button class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#collapse${produto.id_produto}" aria-expanded="false" aria-controls="collapse${produto.id_produto}" onclick="visualizarLote(${produto.id_lote_produto}, ${produto.id_produto})">Lote</button>
-                    <button class="btn btn-danger btn-sm" onclick="excluirProduto(${produto.id_lote_produto})">Excluir</button>
-                </td>
-            `;
-
+				<td>${produto.nome_produto}</td>
+				<td>${produto.tamanho_produto}</td>
+				<td>${produto.cor_produto}</td>
+				<td>${produto.etapa_atual || 'Sem etapa em andamento'}</td>
+				<td>${botoes}</td>
+			`;
+	
 			const collapseRow = document.createElement("tr");
 			collapseRow.innerHTML = `
-                <td colspan="6" class="p-0">
-                    <div class="collapse" id="collapse${produto.id_produto}">
-                        <div class="card card-body">
-                            Carregando...
-                        </div>
-                    </div>
-                </td>
-            `;
-
+				<td colspan="6" class="p-0">
+					<div class="collapse" id="collapse${produto.id_produto}">
+						<div class="card card-body">
+							Carregando...
+						</div>
+					</div>
+				</td>
+			`;
+	
 			tabela.appendChild(row);
 			tabela.appendChild(collapseRow);
 		});

@@ -97,7 +97,32 @@ export async function recuperaNLote() {
 export async function recuperaLoteProdutos() {
 	try {
 		const resultLoteProduto = await pool.query(
-			"SELECT p.id_produto, p.nome_produto, p.tamanho_produto, p.cor_produto, l.id_lote_produto, l.preco_produto, l.quantidade_produto, l.nome_produto AS nome_produto_lote, l.n_lote, l.data_criacao FROM Produtos p JOIN Lote_Produto l ON p.id_produto = l.id_produto ORDER BY p.nome_produto, l.quantidade_produto"
+			`SELECT 
+				p.id_produto, 
+				p.nome_produto, 
+				p.tamanho_produto, 
+				p.cor_produto, 
+				l.id_lote_produto, 
+				l.preco_produto, 
+				l.quantidade_produto, 
+				l.nome_produto AS nome_produto_lote, 
+				l.n_lote, 
+				l.data_criacao,
+				e.nome_etapa,
+				em.status
+			FROM 
+				produtos p
+			JOIN 
+				lote_produto l ON p.id_produto = l.id_produto
+			LEFT JOIN 
+				produto_etapa ep ON p.id_produto = ep.fk_produto_id_produto
+			LEFT JOIN 
+				etapa e ON ep.fk_etapa_id_etapa = e.id_etapa
+			LEFT JOIN 
+				etapa_material em ON e.id_etapa = em.fk_etapa_id_etapa
+			ORDER BY 
+				p.nome_produto, l.quantidade_produto;
+			`
 		);
 		const LoteProduto = resultLoteProduto.rows.length > 0;
 		// console.log(LoteProduto)

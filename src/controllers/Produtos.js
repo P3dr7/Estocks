@@ -54,20 +54,53 @@ export async function juncaoProdutoLote(request, reply) {
 	}
 }
 
-export async function recuperaLotesProdutos(){
-	try {
-		const loteProdutos = await recuperaLoteProdutos();
-		// console.log(loteProdutos)
-		if (!loteProdutos) {
-			return { lote: false };
-		} else {
-			return { produtos: loteProdutos };
-		}
-	} catch (error) {
-		console.error("Erro ao verificar o produto:", error);
-		throw error;
-	}
+export async function recuperaLotesProdutos() {
+    try {
+        const loteProdutos = await recuperaLoteProdutos();
+        
+        if (!loteProdutos) {
+            return { lote: false };
+        } else {
+            // Processa os produtos para retornar apenas a etapa com status 1
+            const produtos = loteProdutos.reduce((acc, produto) => {
+                const { id_produto, nome_produto, tamanho_produto, cor_produto, id_lote_produto, preco_produto, quantidade_produto, nome_produto_lote, n_lote, data_criacao, nome_etapa, status } = produto;
+                
+                // Verifica se o produto já foi adicionado ao acumulador
+                if (!acc[id_produto]) {
+                    acc[id_produto] = {
+                        id_produto,
+                        nome_produto,
+                        tamanho_produto,
+                        cor_produto,
+                        id_lote_produto,
+                        preco_produto,
+                        quantidade_produto,
+                        nome_produto_lote,
+                        n_lote,
+                        data_criacao,
+                        etapa_atual: null, // Define como null por padrão
+                    };
+                }
+                
+                // Se o status for 1, define a etapa atual
+                if (status === 1) {
+                    acc[id_produto].etapa_atual = nome_etapa;
+                }
+                if (status === 4){
+					acc[id_produto].etapa_atual = "Finalizado";
+				}
+                return acc;
+            }, {});
+
+            // Converte o acumulador para um array
+            return { produtos: Object.values(produtos) };
+        }
+    } catch (error) {
+        console.error("Erro ao verificar o produto:", error);
+        throw error;
+    }
 }
+
 
 //Criar funcao pra recuperar lote
 export async function recuperaLote(request, reply){

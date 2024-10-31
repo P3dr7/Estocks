@@ -191,6 +191,9 @@ export async function atualizaStatusEtapaDB(dados){
 		} else if (status == 0) {
 			await pool.query(`UPDATE etapa_material SET status = 0 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
 			return({ success: true, message: 'Etapa Reiniciada' });
+		} else if (status == 4) {
+			await pool.query(`UPDATE etapa_material SET status = 4 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
+			return({ success: true, message: 'Etapa ACABADA' });
 		}
 		
 

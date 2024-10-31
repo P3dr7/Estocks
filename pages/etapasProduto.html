@@ -54,6 +54,7 @@
                 <button class="btn btn-secondary" onclick="voltarPagina()">Voltar</button>
                 <button class="btn btn-outline-danger" onclick="voltarEtapa()">Etapa Anterior</button>
                 <button class="btn btn-outline-primary" onclick="proximaEtapa()">Proxima Etapa</button>
+                <button class="btn btn-danger" onclick="finalizaProduto()">Finaliza Produto</button>
                 <button class="btn btn-primary" onclick="adicionarEtapa()">Adicionar Etapa</button>
             </div>
         </div>
@@ -190,6 +191,70 @@
                 alert('Erro ao reverter a etapa.');
             }
         };
+
+        const finalizaProduto = async () => {
+            const etapasTableBody = document.getElementById('etapasTableBody');
+            const rows = etapasTableBody.querySelectorAll('tr');
+
+            // 1. Verifica se todas as etapas estão concluídas
+            const todasConcluidas = Array.from(rows).every(row => {
+                const statusBadge = row.querySelector('.badge');
+                return statusBadge && statusBadge.textContent === 'Concluída';
+            });
+
+            if (!todasConcluidas) {
+                alert("Para finalizar o produto, todas as etapas precisam estar concluídas.");
+                return;
+            }
+
+            // 2. Exibe confirmação para o usuário
+            const confirmacao = confirm("Tem certeza de que deseja finalizar este produto? Esta ação não pode ser desfeita.");
+            if (!confirmacao) return;
+
+            try {
+                const etapas = Array.from(rows).map(row => {
+                    const idEtapa = row.cells[0]?.textContent.trim();
+                    if (!idEtapa) console.warn("ID da etapa não encontrado para uma linha:", row);
+                    return { id_etapa: idEtapa, status: 4 };
+                });
+
+                // Verifica se algum ID de etapa está indefinido
+                if (etapas.some(etapa => !etapa.id_etapa)) {
+                    alert("Erro ao coletar IDs das etapas. Verifique a estrutura da tabela.");
+                    return;
+                }
+
+                // Envia cada etapa separadamente
+                for (const etapa of etapas) {
+                    const response = await fetch(`http://127.0.0.1:3333/atualizaStatusEtapa`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(etapa)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP! Status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (!data.success) {
+                        alert(data.error || "Erro ao finalizar uma das etapas do produto.");
+                        return;
+                    }
+                }
+
+                alert("Produto finalizado com sucesso!");
+                window.location.reload(); // Recarrega a página para refletir a atualização
+
+            } catch (error) {
+                console.error("Erro ao finalizar o produto:", error);
+                alert("Erro ao finalizar o produto.");
+            }
+        };
+
 
 
         const proximaEtapa = async () => {
