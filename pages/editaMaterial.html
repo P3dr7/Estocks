@@ -102,12 +102,11 @@
                 id_material: materialId,
                 nome_material: document.getElementById('nome_material').value,
                 quantidade_material: document.getElementById('quantidade_material').value,
-                preco_material: document.getElementById('preco_material').value
             };
 
             try {
-                const response = await fetch('http://127.0.0.1:3333/atualizaEstoque', {
-                    method: 'POST',
+                const response = await fetch('http://127.0.0.1:3333/atualizaMaterial', {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -115,9 +114,10 @@
                 });
                 const data = await response.json();
                 if (data.success) {
-                    alert('Produto atualizado com sucesso!');
+                    alert('Material atualizado com sucesso!');
+                    window.location.href = 'material.html'; 
                 } else {
-                    alert('Erro ao atualizar o produto.');
+                    alert('Erro ao atualizar o Material.');
                 }
             } catch (error) {
                 console.error('Erro ao atualizar o produto:', error);

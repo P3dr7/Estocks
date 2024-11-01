@@ -1,10 +1,14 @@
-import { recuperaEstoque, recuperaEstoqueById, getMaterialById } from "../db/consult.js";
-import { inserirEstoque, atualizaQuantidadeMaterialDB } from "../db/insert.js";
+import { getProdutosFinalizado, recuperaEstoqueById, getMaterialById, recuperaEstoque, getEtapaMaterialByProdutoId } from "../db/consult.js";
+import { inserirEstoque, atualizaQuantidadeMaterialDB, atualizaMaterialDB } from "../db/insert.js";
 import { excluirProdutoEstoqueDB } from "./verifica.js";
+import axios from 'axios';
 
 export async function getEstoque(request, reply) {
     try {
-        const estoque = await recuperaEstoque();
+        // console.log('tentou')
+        const estoque = await getProdutosFinalizado();
+        // console.log('passou')
+        // console.log('estoqe', estoque)
         reply.send(estoque);
         
     } catch (error) {   
@@ -12,6 +16,16 @@ export async function getEstoque(request, reply) {
         console.error("Erro ao buscar o estoque:", error);
     }
 };
+
+export async function getMaterial(request, reply){
+    try {
+        const material = await recuperaEstoque();
+        reply.send(material);
+    } catch (error) {
+        reply.send({ error: "Erro ao buscar o material" });
+        console.error("Erro ao buscar o material:", error);
+    }
+}
 
 export async function getEstoqueById(request, reply) {
     try{
@@ -23,7 +37,7 @@ export async function getEstoqueById(request, reply) {
     }
 }
 
-export async function postEstoque(request, reply) {
+export async function postMaterial(request, reply) {
     try {
         const { nomeMaterial, quantidadeMaterial  } = request.body;
         if (!nomeMaterial || !quantidadeMaterial) {
@@ -40,9 +54,9 @@ export async function postEstoque(request, reply) {
             reply.send({ error: "Material já cadastrado" });
             return;
         }
-
+        // console.log("materialid", materialid)
         await inserirEstoque({ idMaterial: materialid, nomeMaterial, quantidadeMaterial });
-        reply.send({ success: "Material cadastrado com sucesso" });
+        reply.send({ success: true, message: "Material adicionado com sucesso" });
 
 
 
@@ -72,7 +86,7 @@ export async function excluirProdutoEstoque(request, reply){
 
 export async function atualizaQuantidadeMaterial(dados) {
     const { idMaterial, quantidadeMaterial } = dados;
-    // console.log("dados material", dados)
+    console.log("dados material", dados)
     try {
         // Buscar o material pelo ID no banco de dados
         // console.log("idMaterial", idMaterial)
@@ -119,3 +133,59 @@ export async function getMaterialByEtapaId(id_etapa){
         return { success: false, error: 'Erro ao buscar o material' };
     }
 }
+
+export async function voltaProduto(request, reply) {
+    const dados = request.body;
+    const idProduto = dados.id;
+    console.log('dados', dados);
+    console.log('id Produto', idProduto);
+
+    try {
+        // Obtenha todas as etapas associadas ao produto
+        const etapasMaterial = await getEtapaMaterialByProdutoId(idProduto);
+
+        if (!etapasMaterial || etapasMaterial.length === 0) {
+            return reply.send({ error: 'Nenhuma etapa encontrada para este produto.' });
+        }
+
+        // Loop para cada etapa encontrada
+        for (const etapa of etapasMaterial) {
+            const idEtapa = etapa.id_etapa;
+            console.log(`Atualizando etapa ${idEtapa} para o produto ${idProduto}`);
+
+            try {
+                // Envia a requisição para atualizar o status de cada etapa
+                await axios.put('http://127.0.0.1:3333/atualizaStatusEtapa', {
+                    id_etapa: idEtapa,
+                    status: 0
+                });
+                console.log(`Status da etapa ${idEtapa} atualizado com sucesso`);
+            } catch (error) {
+                console.error(`Erro ao atualizar o status da etapa ${idEtapa}:`, error);
+            }
+        }
+
+        reply.send({ success: true, message: 'Todas as etapas foram atualizadas', idProduto, etapasAtualizadas: etapasMaterial });
+    } catch (error) {
+        console.error('Erro ao buscar etapas do produto:', error);
+        reply.send({ error: 'Erro ao buscar etapas do produto' });
+    }
+};
+
+export async function atualizaMaterial(request, reply){
+    const dados = request.body;
+    const { id_material, nome_material ,quantidade_material } = dados;
+    
+    try{
+        const material = await atualizaMaterialDB({ id_material, nome_material ,quantidade_material });
+        if(material.success){
+            reply.send({ success: true });
+        }else{
+            throw new Error(`Erro ao atualizar a quantidade do material com id ${id_material}.`);
+        }
+    }catch(error){
+        console.error('Erro ao atualizar o material:', error);
+        reply.send({ success: false, error: 'Erro ao atualizar o material' });
+    }
+}
+

@@ -247,7 +247,7 @@
                 }
 
                 alert("Produto finalizado com sucesso!");
-                window.location.reload(); // Recarrega a página para refletir a atualização
+                window.location.href = 'produtos.html'; // Recarrega a página para refletir a atualização
 
             } catch (error) {
                 console.error("Erro ao finalizar o produto:", error);
@@ -318,7 +318,7 @@
 
         const editarProduto = (id) => {
             // Corrigido para usar o ID passado como parâmetro
-            window.location.href = `editaEstoque.html?id=${id}`;
+            window.location.href = `editaEtapa.html?id=${id}`;
         };
 
         const iniciarEtapa = async (id_etapa) => {

@@ -188,6 +188,16 @@ export function obterTimestampBrasilia() {
 		.replace("T", " ");
 	return timestampBrasilia;
 }
+export function dateAtual(){
+const dataAtual = new Date();
+
+// Formatar a data para YYYY-MM-DD
+const ano = dataAtual.getFullYear();
+const mes = String(dataAtual.getMonth() + 1).padStart(2, '0'); // Mês começa de 0, então adicionamos 1
+const dia = String(dataAtual.getDate()).padStart(2, '0');
+
+const dataFormatada = `${ano}-${mes}-${dia}`;
+return dataFormatada;}
 
 export function formatarTimestamp(timestampISO) {
 	// Converte o timestamp para um objeto Date

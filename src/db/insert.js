@@ -134,12 +134,12 @@ export async function inserirEtapa(dados) {
 
 
 export async function inserirEstoque (dados) {
-	const {idMaterial,nomeMaterial, quantidadeMaterial, fkEtapa} = dados
+	const {idMaterial,nomeMaterial, quantidadeMaterial} = dados
 	// console.log('dados:', dados)
 	try {
-		await pool.query(` INSERT INTO estoque_material (id_material, nome_material, quantidade_material, fk_etapa_id_etapa)
-			VALUES ($1, $2, $3, $4)`,
-			[idMaterial, nomeMaterial, quantidadeMaterial, fkEtapa]
+		await pool.query(` INSERT INTO estoque_material (id_material, nome_material, quantidade_material)
+			VALUES ($1, $2, $3)`,
+			[idMaterial, nomeMaterial, quantidadeMaterial]
 		);
 		return({ success: true });
 	} catch (error) {
@@ -182,6 +182,9 @@ async function insereMaterialEtapa(id_material, id_etapa, quantidade_gasta, stat
 export async function atualizaStatusEtapaDB(dados){
 	try{
 		const { id_etapa, status } = dados;
+		console.log(status)
+		const dataConclusao = dados.data
+		console.log('dados:', dados)
 		if (status == 1) {
 			await pool.query(`UPDATE etapa_material SET status = 1 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
 			return({ success: true, message: 'Etapa Em Andamento' });
@@ -192,7 +195,7 @@ export async function atualizaStatusEtapaDB(dados){
 			await pool.query(`UPDATE etapa_material SET status = 0 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
 			return({ success: true, message: 'Etapa Reiniciada' });
 		} else if (status == 4) {
-			await pool.query(`UPDATE etapa_material SET status = 4 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
+			await pool.query(`UPDATE etapa_material SET status = 4, data_conclusao = $2 WHERE fk_etapa_id_etapa = $1`, [id_etapa, dataConclusao]);
 			return({ success: true, message: 'Etapa ACABADA' });
 		}
 		
@@ -214,4 +217,43 @@ export async function atualizaQuantidadeMaterialDB(dados){
 		console.error('Erro ao atualizar a quantidade do material:', error);
 		return({ success: false, error: 'Erro ao atualizar a quantidade do material' });
 	}
+}
+
+export async function atualizaMaterialDB(dados) {
+	try {
+		const {id_material, nome_material, quantidade_material} = dados;
+		
+		await pool.query(` UPDATE estoque_material SET quantidade_material = $1, nome_material = $2  WHERE id_material = $3`, [quantidade_material, nome_material, id_material]);
+		return({ success: true });
+	} catch (error) {
+		console.error('Erro ao adicionar o material:', error);
+		return({ success: false, error: 'Erro ao adicionar o material' });
+	}
+}
+
+export async function atualizaProduto(id_produto, nome_produto, tamanho_produto, cor_produto) {
+    // Exemplo usando SQL direto (se você estiver usando uma biblioteca para SQL)
+    const query = `
+        UPDATE produtos 
+        SET nome_produto = $1, tamanho_produto = $2, cor_produto = $3
+        WHERE id_produto = $4
+        RETURNING *;
+    `;
+    const values = [nome_produto, tamanho_produto, cor_produto, id_produto];
+    const result = await pool.query(query, values); // 'db.query' deve ser a função de execução SQL
+
+    return result.rowCount > 0; // Retorna true se a atualização foi bem-sucedida
+}
+
+export async function atualizaLote(id_produto, preco_produto, quantidade_produto, n_lote) {
+    const query = `
+        UPDATE lote_produto 
+        SET preco_produto = $1, quantidade_produto = $2, n_lote = $3
+        WHERE id_produto = $4
+        RETURNING *;
+    `;
+    const values = [preco_produto, quantidade_produto, n_lote, id_produto];
+    const result = await pool.query(query, values);
+
+    return result.rowCount > 0;
 }

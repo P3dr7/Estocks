@@ -1,10 +1,10 @@
-import { inserirLote, inserirProduto } from "../db/insert.js";
+import { inserirLote, inserirProduto, atualizaProduto, atualizaLote } from "../db/insert.js";
 import { recuperaNLote, verificaProdutoExiste, recuperaLoteProdutos, obterTimestampBrasilia, recuperaLoteDB, formatarTimestamp, moneyToFloat, excluirProdutoDB} from "./verifica.js";
 import { recuperaProduto } from "../db/consult.js";
 
 export async function juncaoProdutoLote(request, reply) {
 	const { tamanho, cor, precoProduto, quantidadeProduto, nomeProduto } = request.body;
-
+	console.log(precoProduto)
 	// Verificação se todos os campos necessários estão presentes
 	if (!nomeProduto || !tamanho || !cor || !precoProduto || !quantidadeProduto) {
 		reply.status(400).send({ error: "Dados incompletos ou inválidos" });
@@ -158,4 +158,27 @@ export async function recuperaProdutobyID(request, reply) {
 	const dadosProduto = await recuperaProduto(id)
 	// console.log(dadosProduto)
 	reply.send(dadosProduto)
+}
+
+export async function editaProduto(request, reply) {
+    const dados = request.body;
+    const { id_produto, nome_produto, tamanho_produto, cor_produto, preco_produto, quantidade_produto, n_lote } = dados;
+
+    try {
+        // Atualizar o produto
+        const produtoAtualizado = await atualizaProduto(id_produto, nome_produto, tamanho_produto, cor_produto);
+
+        // Atualizar o lote
+        const loteAtualizado = await atualizaLote(id_produto, preco_produto, quantidade_produto, n_lote);
+
+        if (!produtoAtualizado || !loteAtualizado) {
+            reply.status(404).send({ sucesso: false, mensagem: "Produto ou lote não encontrado" });
+        } else {
+            reply.send({ ok: true, mensagem: "Produto e lote atualizados com sucesso" });
+        }
+
+    } catch (error) {
+        console.error("Erro ao atualizar o produto e lote:", error);
+        reply.status(500).send({ erro: "Erro ao processar a solicitação" });
+    }
 }

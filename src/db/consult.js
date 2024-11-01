@@ -112,3 +112,18 @@ export async function getEtapaMaterialByProdutoId(id_produto) {
         return({ error: 'Erro ao buscar os produtos em estoque' });
     }
 }
+
+export async function getProdutosFinalizado(){
+    try {
+        const numero = 4
+        const { rows } = await pool.query(`SELECT DISTINCT pd.id_produto, pd.nome_produto, pd.tamanho_produto, pd.cor_produto, lt.preco_produto, lt.quantidade_produto, lt.n_lote
+            FROM produtos pd
+            JOIN lote_produto lt ON pd.id_produto = lt.id_produto
+            JOIN produto_etapa ep ON ep.fk_produto_id_produto = pd.id_produto
+            JOIN etapa_material em ON ep.fk_etapa_id_etapa = em.fk_etapa_id_etapa
+            WHERE em.status = $1;`, [numero]);
+        return(rows);
+    } catch (error) {
+        return({ error: 'Erro ao buscar os produtos em estoque' });
+    }
+}

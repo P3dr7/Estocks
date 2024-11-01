@@ -113,7 +113,7 @@
 
                 
         function preencheMateriais() {
-            fetch('http://127.0.0.1:3333/estoque')
+            fetch('http://127.0.0.1:3333/material')
                 .then(response => response.json())
                 .then(data => {
                     const selects = document.querySelectorAll('select[name="material_x[]"]');
@@ -191,6 +191,7 @@
                 fetch(`http://127.0.0.1:3333/produto/${produtoId}`)
                     .then(response => response.json())
                     .then(data => {
+                        console.log(data);
                         if (data && data.nome_produto) {
                             document.getElementById('floatingProduto').value = `${data.nome_produto} - ${data.cor_produto}`;
                         } else {

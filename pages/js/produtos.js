@@ -114,12 +114,22 @@ const visualizarLote = async (idLote, idProduto) => {
 			return;
 		}
 
+		// Formata os valores com vírgula
+		const precoFormatado = lote.preco_produto.toLocaleString("pt-BR", {
+			style: "currency",
+			currency: "BRL",
+		});
+		const valorLoteFormatado = lote.valorLote.toLocaleString("pt-BR", {
+			style: "currency",
+			currency: "BRL",
+		});
+
 		collapseElement.innerHTML = `
             <p><strong>ID do Lote:</strong> ${lote.id_lote}</p>
             <p><strong>Data de Fabricação:</strong> ${lote.data_fabricacao}</p>
-			<p><strong>Valor Unitario:</strong> R$${lote.preco_produto}</p>
-            <p><strong>Valor do Lote:</strong> R$${lote.valorLote}</p>
-            <p><strong>Quantidade:</strong> ${lote.quantidade}</p>
+			<p><strong>Valor Unitario:</strong> ${precoFormatado}</p>
+            <p><strong>Valor do Lote:</strong> ${valorLoteFormatado}</p>
+            <p><strong>Quantidade:</strong> ${quantidadeFormatada}</p>
         `;
 
 		// Alterna o colapso ao clicar no botão
@@ -140,6 +150,7 @@ const visualizarLote = async (idLote, idProduto) => {
 		}
 	}
 };
+
 
 // Função para excluir um produto
 const excluirProduto = async (id) => {

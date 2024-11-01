@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <title>Material</title>
+    <title>Estoque</title>
 </head>
 <body class="bg-body-tertiary">
     <div class="d-flex">
@@ -31,19 +31,20 @@
 
         <!-- Conteúdo Principal -->
         <div class="container my-5">
-            <h1 class="mb-4">Material</h1>
+            <h1 class="mb-4">Estoque</h1>
 
             <div class="d-flex justify-content-between mb-3">
-                <button class="btn btn-primary" onclick="adicionarProduto()">Adicionar Material</button>
             </div>
 
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>ID Material</th>
-                        <th>Nome do Material</th>
+                        <th>Selecionar</th>
+                        <th>Nome do Produto</th>
+                        <th>Tamanho Produto</th>
                         <th>Quantidade</th>
-                        <th>Ações</th>
+                        <th>Valor Produto</th>
+                        <th>Lote</th>
                     </tr>
                 </thead>
                 <tbody id="productTableBody">
@@ -60,7 +61,7 @@
 
         async function loadProducts() {
             try {
-                const response = await fetch('http://127.0.0.1:3333/material'); // URL da sua API para listar o estoque
+                const response = await fetch('http://127.0.0.1:3333/estoque'); // URL da sua API para listar o estoque
                 const produtos = await response.json();
 
                 const tableBody = document.getElementById('productTableBody');
@@ -68,22 +69,26 @@
 
                 if (produtos.length > 0) {
                     produtos.forEach(produto => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${produto.id_material}</td>
-                        <td>${produto.nome_material}</td>
-                        <td>${produto.quantidade_material}</td>
-                        <td>
-                            <button class="btn btn-success btn-sm" onclick="editarProduto(${produto.id_material})">Editar</button>
-                            <button class="btn btn-danger btn-sm" onclick="excluirProduto(${produto.id_material})">Excluir</button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <input type="checkbox" class="etapa-checkbox" data-id="${produto.id_produto}">
+                            </td>
+                            <td>${produto.nome_produto}</td>
+                            <td>${produto.tamanho_produto} cm</td>
+                            <td>${produto.quantidade_produto}</td>
+                            <td>${produto.preco_produto}</td>
+                            <td>${produto.n_lote}</td>
+                            <td>
+                                <button class="btn btn-success btn-sm" onclick="voltarProduto()">Volta Produto</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
                 } else {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td colspan="4" class="text-center">Nenhum produto encontrado no estoque.</td>
+                        <td colspan="6" class="text-center">Nenhum produto encontrado no estoque.</td>
                     `;
                     tableBody.appendChild(row);
                 }
@@ -92,44 +97,50 @@
             }
         }
 
-        function adicionarProduto() {
-            window.location.href = './adicionarMatEstoque.html'; 
-        }
 
-        const editarProduto = (id) => {
-            // Corrigido para usar o ID passado como parâmetro
-            window.location.href = `editaMaterial.html?id=${id}`;
-        };
+        
 
-        const excluirProduto = async (id) => {
-            try {
-                console.log('Excluindo produto:', id);
-                const response = await fetch(`http://127.0.0.1:3333/excluirProdutoEstoque/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+        const voltarProduto = async () => {
+        try {
+            // Seleciona o checkbox marcado
+            const checkbox = document.querySelector('.etapa-checkbox:checked');
 
-                const data = await response.json();
-
-                // Verifique se a exclusão foi bem-sucedida
-                if (data.success) {
-                    // Se a exclusão for bem-sucedida, recarregar a tabela
-                    console.log("Produto excluído com sucesso.");
-                    window.location.reload(); // Atualiza a página inteira
-                } else {
-                    console.error("Erro ao excluir o produto:", data.error);
-                }
-            } catch (error) {
-                console.error("Erro ao excluir produto:", error);
+            if (!checkbox) {
+                alert("Por favor, selecione um produto para voltar.");
+                return;
             }
-        };
 
+            // Obtenha o ID do produto selecionado
+            const produtoId = checkbox.getAttribute('data-id');
+
+            // Envia o ID para a API /voltaProduto
+            const response = await fetch(`http://127.0.0.1:3333/voltaProduto`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id: produtoId })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erro HTTP! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Verifique se a resposta foi bem-sucedida
+            if (data.success) {
+                alert("Produto voltou com sucesso!");
+                window.location.reload(); // Recarrega a página para atualizar o status das etapas
+            } else {
+                alert("Erro ao voltar o produto.");
+            }
+        } catch (error) {
+            console.error("Erro ao enviar o produto para voltar:", error);
+        }
+    };
+        
 
 
     </script>

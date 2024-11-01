@@ -4,13 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <title>Estoque</title>
+    <title>Opções de Estoque</title>
+    <style>
+        .center-content {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .btn-lg-custom {
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body class="bg-body-tertiary">
     <div class="d-flex">
         <!-- Menu Lateral -->
         <nav class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 250px; min-height: 100vh;">
-            <h4 class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white"><a href="dashboard.html" style="color: inherit; text-decoration: none;">FENI</a></h4>
+            <h4 class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white">
+                <a href="dashboard.html" style="color: inherit; text-decoration: none;">FENI</a>
+            </h4>
             <hr>
             <ul class="nav nav-pills flex-column mb-auto">
                 <li>
@@ -20,7 +38,7 @@
                     <a href="produtos.html" class="nav-link text-white">Produtos</a>
                 </li>
                 <li>
-                    <a href="estoque.html" class="nav-link text-white">Estoque</a>
+                    <a href="estoque.html" class="nav-link active text-white">Estoque</a>
                 </li>
             </ul>
             <hr>
@@ -30,107 +48,15 @@
         </nav>
 
         <!-- Conteúdo Principal -->
-        <div class="container my-5">
-            <h1 class="mb-4">Estoque</h1>
-
-            <div class="d-flex justify-content-between mb-3">
-            </div>
-
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID Produto</th>
-                        <th>Nome do Produto</th>
-                        <th>Quantidade</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="productTableBody">
-                    <!-- Os produtos serão adicionados dinamicamente aqui -->
-                </tbody>
-            </table>
+        <div class="container center-content">
+            <h1 class="mb-4">Opções de Estoque</h1>
+            
+            <!-- Botões para Estoque de Produtos e Materiais -->
+            <button onclick="window.location.href='estoqueProduto.html'" class="btn btn-primary btn-lg-custom">Estoque de Produtos</button>
+            <button onclick="window.location.href='material.html'" class="btn btn-secondary btn-lg-custom">Estoque de Materiais</button>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadProducts();
-        });
-
-        async function loadProducts() {
-            try {
-                const response = await fetch('http://127.0.0.1:3333/estoque'); // URL da sua API para listar o estoque
-                const produtos = await response.json();
-
-                const tableBody = document.getElementById('productTableBody');
-                tableBody.innerHTML = ''; // Limpa a tabela antes de carregar os produtos
-
-                if (produtos.length > 0) {
-                    produtos.forEach(produto => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${produto.id_material}</td>
-                        <td>${produto.nome_material}</td>
-                        <td>${produto.quantidade_material}</td>
-                        <td>
-                            <button class="btn btn-success btn-sm" onclick="editarProduto(${produto.id_material})">Editar</button>
-                            <button class="btn btn-danger btn-sm" onclick="excluirProduto(${produto.id_material})">Excluir</button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-                } else {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td colspan="4" class="text-center">Nenhum produto encontrado no estoque.</td>
-                    `;
-                    tableBody.appendChild(row);
-                }
-            } catch (error) {
-                console.error('Erro ao carregar os produtos:', error);
-            }
-        }
-
-        function adicionarProduto() {
-            window.location.href = './adicionarProdEstoque.html'; 
-        }
-
-        const editarProduto = (id) => {
-            // Corrigido para usar o ID passado como parâmetro
-            window.location.href = `editaEstoque.html?id=${id}`;
-        };
-
-        const excluirProduto = async (id) => {
-            try {
-                console.log('Excluindo produto:', id);
-                const response = await fetch(`http://127.0.0.1:3333/excluirProdutoEstoque/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                // Verifique se a exclusão foi bem-sucedida
-                if (data.success) {
-                    // Se a exclusão for bem-sucedida, recarregar a tabela
-                    console.log("Produto excluído com sucesso.");
-                    window.location.reload(); // Atualiza a página inteira
-                } else {
-                    console.error("Erro ao excluir o produto:", data.error);
-                }
-            } catch (error) {
-                console.error("Erro ao excluir produto:", error);
-            }
-        };
-
-
-
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Vx0pDdVB2qS7mfmu4K/rE3ke8QuSYBQquke8PbFPdFfGFRizMj2Aq4sqFbC2Ev5o" crossorigin="anonymous"></script>
 </body>
 </html>
