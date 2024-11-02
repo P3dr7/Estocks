@@ -97,7 +97,7 @@
                         <th>Preço</th>
                         <th>Quantidade</th>
                         <th>Nº Lote</th>
-                        <th>Data de Criação</th>
+                        <th>Data de Conclusão</th>
                     </tr>
                 </thead>
                 <tbody id="concluidosTableBody">
@@ -120,22 +120,35 @@
                 // Chamadas das três APIs para obter os dados
                 const responseLotes = await fetch('http://127.0.0.1:3333/recuperaLotesProdutos');
                 const produtosEmAndamento = await responseLotes.json();
+                console.log("Produtos em Andamento:", produtosEmAndamento);
+    
                 const responseMateriais = await fetch('http://127.0.0.1:3333/material');
                 const materiais = await responseMateriais.json();
+                console.log("Materiais:", materiais);
+    
                 const responseEstoque = await fetch('http://127.0.0.1:3333/estoque');
                 const produtosConcluidos = await responseEstoque.json();
-    
-                console.log("Produtos em Andamento:", produtosEmAndamento);
-                console.log("Materiais:", materiais);
                 console.log("Produtos Concluídos:", produtosConcluidos);
     
                 // Soma total de todos os tipos de itens em estoque
+                const totalQuantidadeProdutosEmAndamento = produtosEmAndamento.produtos.reduce((acc, produto) => {
+                    return acc + parseInt(produto.quantidade_produto, 10);
+                }, 0);
+    
+                const totalQuantidadeMateriais = materiais.reduce((acc, material) => {
+                    return acc + parseInt(material.quantidade_material, 10);
+                }, 0);
+    
+                const totalQuantidadeProdutosConcluidos = produtosConcluidos.reduce((acc, produto) => {
+                    return acc + parseInt(produto.quantidade_produto, 10);
+                }, 0);
+    
                 const totalProdutosEmEstoque =
-                    produtosEmAndamento.length + materiais.length + produtosConcluidos.length;
+                    totalQuantidadeProdutosEmAndamento + totalQuantidadeMateriais + totalQuantidadeProdutosConcluidos;
     
                 document.getElementById('produtosEmEstoque').textContent = totalProdutosEmEstoque;
                 document.getElementById('tiposMateriais').textContent = materiais.length;
-                document.getElementById('produtosConcluidos').textContent = produtosConcluidos.length;
+                document.getElementById('produtosConcluidos').textContent = totalQuantidadeProdutosConcluidos;
             } catch (error) {
                 console.error('Erro ao carregar dados do dashboard:', error);
             }
@@ -144,19 +157,25 @@
         async function loadProductsInProgress() {
             try {
                 const response = await fetch('http://127.0.0.1:3333/recuperaLotesProdutos');
-                const produtos = await response.json();
-                console.log("Produtos em Andamento:", produtos);
+                const produtosEmAndamento = await response.json();
+                console.log("Produtos em Andamento:", produtosEmAndamento);
     
                 const tableBody = document.getElementById('produtosTableBody');
                 tableBody.innerHTML = '';
-                produtos.forEach(produto => {
+    
+                // Acesse o array de produtos corretamente
+                produtosEmAndamento.produtos.forEach(produto => {
+                    const precoFormatado = `R$ ${parseFloat(produto.preco_produto).toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2
+                    })}`;
+    
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${produto.id_produto}</td>
                         <td>${produto.nome_produto}</td>
                         <td>${produto.tamanho_produto}</td>
                         <td>${produto.cor_produto}</td>
-                        <td>${produto.preco_produto}</td>
+                        <td>${precoFormatado}</td>
                         <td>${produto.quantidade_produto}</td>
                         <td>${produto.n_lote}</td>
                     `;
@@ -198,16 +217,20 @@
                 const tableBody = document.getElementById('concluidosTableBody');
                 tableBody.innerHTML = '';
                 produtos.forEach(produto => {
+                    const precoFormatado = `R$ ${parseFloat(produto.preco_produto).toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2
+                    })}`;
+    
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${produto.id_produto}</td>
                         <td>${produto.nome_produto}</td>
                         <td>${produto.tamanho_produto}</td>
                         <td>${produto.cor_produto}</td>
-                        <td>${produto.preco_produto}</td>
+                        <td>${precoFormatado}</td>
                         <td>${produto.quantidade_produto}</td>
                         <td>${produto.n_lote}</td>
-                        <td>${new Date(produto.data_criacao).toLocaleDateString()}</td>
+                        <td>${new Date(produto.data_conclusao).toLocaleDateString()}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -215,6 +238,7 @@
                 console.error('Erro ao carregar produtos concluídos:', error);
             }
         }
-    </script>
+    </script>    
+    
 </body>
 </html>

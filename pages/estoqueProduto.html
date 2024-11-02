@@ -45,6 +45,8 @@
                         <th>Quantidade</th>
                         <th>Valor Produto</th>
                         <th>Lote</th>
+                        <th>Data de Conclusão</th>
+                        <th>Ação</th>
                     </tr>
                 </thead>
                 <tbody id="productTableBody">
@@ -69,6 +71,9 @@
 
                 if (produtos.length > 0) {
                     produtos.forEach(produto => {
+                        const precoFormatado = `R$ ${parseFloat(produto.preco_produto).toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2
+                        })}`;
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>
@@ -77,8 +82,9 @@
                             <td>${produto.nome_produto}</td>
                             <td>${produto.tamanho_produto} cm</td>
                             <td>${produto.quantidade_produto}</td>
-                            <td>${produto.preco_produto}</td>
+                            <td>${precoFormatado}</td>
                             <td>${produto.n_lote}</td>
+                            <td>${new Date(produto.data_conclusao).toLocaleDateString()}</td>
                             <td>
                                 <button class="btn btn-success btn-sm" onclick="voltarProduto()">Volta Produto</button>
                             </td>

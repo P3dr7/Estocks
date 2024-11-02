@@ -129,7 +129,7 @@ const visualizarLote = async (idLote, idProduto) => {
             <p><strong>Data de Fabricação:</strong> ${lote.data_fabricacao}</p>
 			<p><strong>Valor Unitario:</strong> ${precoFormatado}</p>
             <p><strong>Valor do Lote:</strong> ${valorLoteFormatado}</p>
-            <p><strong>Quantidade:</strong> ${quantidadeFormatada}</p>
+            <p><strong>Quantidade:</strong> ${lote.quantidade}</p>
         `;
 
 		// Alterna o colapso ao clicar no botão

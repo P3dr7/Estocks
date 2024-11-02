@@ -116,7 +116,7 @@ export async function getEtapaMaterialByProdutoId(id_produto) {
 export async function getProdutosFinalizado(){
     try {
         const numero = 4
-        const { rows } = await pool.query(`SELECT DISTINCT pd.id_produto, pd.nome_produto, pd.tamanho_produto, pd.cor_produto, lt.preco_produto, lt.quantidade_produto, lt.n_lote
+        const { rows } = await pool.query(`SELECT DISTINCT pd.id_produto, pd.nome_produto, pd.tamanho_produto, pd.cor_produto, lt.preco_produto, lt.quantidade_produto, lt.n_lote, em.data_conclusao
             FROM produtos pd
             JOIN lote_produto lt ON pd.id_produto = lt.id_produto
             JOIN produto_etapa ep ON ep.fk_produto_id_produto = pd.id_produto

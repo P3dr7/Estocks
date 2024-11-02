@@ -185,27 +185,28 @@
             const produtoId = urlParams.get('id');
 
             if (produtoId) {
+                // Verifica se o ID está correto e é um número
+                console.log('Produto ID:', produtoId); // Adicione este log para verificar se o ID é capturado corretamente
                 document.getElementById('produtoId').value = produtoId;
 
-                // Busque as informações do produto com base no ID
+                // Fetch para buscar informações do produto
                 fetch(`http://127.0.0.1:3333/produto/${produtoId}`)
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data);
                         if (data && data.nome_produto) {
                             document.getElementById('floatingProduto').value = `${data.nome_produto} - ${data.cor_produto}`;
                         } else {
-                            console.error('Produto não encontrado');
                             document.getElementById('aviso').textContent = 'Produto não encontrado.';
                         }
                     })
-                    .catch(error => console.error('Erro ao buscar os dados do produto:', error));
+                    .catch(error => {
+                        console.error('Erro ao buscar os dados do produto:', error);
+                        document.getElementById('aviso').textContent = 'Erro ao buscar os dados do produto.';
+                    });
             } else {
                 console.error('ID do produto não encontrado na URL');
                 document.getElementById('aviso').textContent = 'ID do produto não encontrado na URL.';
             }
-
-            // Preenche os materiais ao carregar a página
             preencheMateriais();
         });
 
@@ -278,7 +279,7 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Etapa cadastrada com sucesso:', data);
-                window.location.href = 'etapasProduto.html'; // Redireciona após cadastro
+                window.location.href = `etapasProduto.html?id=${produtoId}`; 
             })
             .catch(error => {
                 console.error('Erro ao cadastrar a etapa:', error);

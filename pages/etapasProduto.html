@@ -202,6 +202,11 @@
                 return statusBadge && statusBadge.textContent === 'Concluída';
             });
 
+            if(!rows.length) {
+                alert("Não há etapas cadastradas para este produto.");
+                return;
+            }
+
             if (!todasConcluidas) {
                 alert("Para finalizar o produto, todas as etapas precisam estar concluídas.");
                 return;

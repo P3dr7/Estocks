@@ -179,31 +179,42 @@ async function insereMaterialEtapa(id_material, id_etapa, quantidade_gasta, stat
 	}
 }
 
-export async function atualizaStatusEtapaDB(dados){
-	try{
-		const { id_etapa, status } = dados;
-		console.log(status)
-		const dataConclusao = dados.data
-		console.log('dados:', dados)
-		if (status == 1) {
-			await pool.query(`UPDATE etapa_material SET status = 1 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
-			return({ success: true, message: 'Etapa Em Andamento' });
-		} else if (status == 2) {
-			await pool.query(`UPDATE etapa_material SET status = 2 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
-			return({ success: true, message: 'Etapa Concluída' });
-		} else if (status == 0) {
-			await pool.query(`UPDATE etapa_material SET status = 0 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
-			return({ success: true, message: 'Etapa Reiniciada' });
-		} else if (status == 4) {
-			await pool.query(`UPDATE etapa_material SET status = 4, data_conclusao = $2 WHERE fk_etapa_id_etapa = $1`, [id_etapa, dataConclusao]);
-			return({ success: true, message: 'Etapa ACABADA' });
-		}
-		
+export async function atualizaStatusEtapaDB(dados) {
+    try {
+        const { id_etapa, status, data } = dados;
+        console.log('dataConclusao: dados.data', dados.data);
+        console.log(data);
+        console.log('dados: db', dados);
+        const dataConclusao = dados.data;
+        console.log('dataConclusao:', dataConclusao);
 
-	}catch(error){
-		console.error('Erro ao atualizar o status da etapa:', error);
-		return({ success: false, error: 'Erro ao atualizar o status da etapa' });
-	}
+        if (status === 1) {
+            await pool.query(`UPDATE etapa_material SET status = 1 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
+            return { success: true, message: 'Etapa Em Andamento' };
+        } else if (status === 2) {
+            await pool.query(`UPDATE etapa_material SET status = 2 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
+            return { success: true, message: 'Etapa Concluída' };
+        } else if (status === 0) {
+            await pool.query(`UPDATE etapa_material SET status = 0 WHERE fk_etapa_id_etapa = $1`, [id_etapa]);
+            return { success: true, message: 'Etapa Reiniciada' };
+        } else if (status === 4) {
+            if (dataConclusao) {
+                // Atualiza apenas se dataConclusao estiver definida
+                await pool.query(
+                    `UPDATE etapa_material SET status = 4, data_conclusao = $2 WHERE fk_etapa_id_etapa = $1`,
+                    [id_etapa, dataConclusao]
+                );
+                return { success: true, message: 'Etapa ACABADA' };
+            } else {
+                // Se dataConclusao estiver ausente, lance um erro ou lide com isso adequadamente
+                console.error('Data de conclusão está ausente para status 4');
+                return { success: false, message: 'Data de conclusão está ausente' };
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar o status da etapa:', error);
+        return { success: false, error: 'Erro ao atualizar o status da etapa' };
+    }
 }
 
 export async function atualizaQuantidadeMaterialDB(dados){
