@@ -26,7 +26,7 @@ function validarForm(event) {
 				// Continua com o restante do código, se necessário
 				if (dadosRecebidos.auth) {
 					// Redirecione para outra página
-					window.location.href = "produtos.html";
+					window.location.href = "dashboard.html";
 				} else if (!dadosRecebidos.auth) {
 					// Exiba um aviso de que os dados são divergentes
 					alert(

@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	
 			row.innerHTML = `
 				<td>${produto.nome_produto}</td>
-				<td>${produto.tamanho_produto}</td>
+				<td>${produto.tamanho_produto} cm</td>
 				<td>${produto.cor_produto}</td>
 				<td>${produto.etapa_atual || 'Sem etapa em andamento'}</td>
 				<td>${botoes}</td>
