@@ -1,4 +1,4 @@
-import { verificaLogado } from "./controllers/Login.js";
+import { verificaLogado, validarToken, logout } from "./controllers/Login.js";
 import { juncaoProdutoLote, recuperaLotesProdutos, recuperaLote, excluirProduto, recuperaProdutobyID, editaProduto } from "./controllers/Produtos.js";
 import { recuperaLoteTeste1 } from "./controllers/Altera.js";
 import { adicionarEtapa, recuperaEtapaDB, excluirEtapa, atualizaStatusEtapa, recuperaEtapa2, atualizaEtapa } from "./controllers/Etapas.js";
@@ -12,6 +12,8 @@ export default function (fastify, options, done) {
 	// fastify.post('/atualizaProduto', AtualizaDadosProduto);
 	fastify.post('/material', postMaterial);
 	fastify.post('/voltaProduto', voltaProduto)
+	fastify.post('/validarToken', validarToken);
+	fastify.post('/logout', logout);
 
 	// GET
 	fastify.get("/verificaLogin", verificaLogado);

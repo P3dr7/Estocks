@@ -1,3 +1,4 @@
+
 function validarForm(event) {
 	event.preventDefault();
 
@@ -16,6 +17,7 @@ function validarForm(event) {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify(dados),
+			credentials: "include",
 		})
 			.then((response) => response.json())
 			.then((data) => {
@@ -24,7 +26,9 @@ function validarForm(event) {
 				console.log("Dados do backend:", dadosRecebidos);
 
 				// Continua com o restante do código, se necessário
-				if (dadosRecebidos.auth) {
+				if (dadosRecebidos.auth) {	
+					console.log("Token recebido:", dadosRecebidos.token);
+					localStorage.setItem('token', dadosRecebidos.token);
 					// Redirecione para outra página
 					window.location.href = "dashboard.html";
 				} else if (!dadosRecebidos.auth) {
@@ -43,7 +47,23 @@ function validarForm(event) {
 }
 
 document.getElementById("produtoForm").addEventListener("submit", enviaProduto);
-
+fetch('http://127.0.0.1:3333/validarToken', {
+	method: 'POST',
+	credentials: 'include', // Garante que cookies sejam enviados na requisição
+})
+.then((response) => response.json())
+.then((data) => {
+	if (data.valid) {
+	console.log('Token válido:', data.decoded);
+	} else {
+	console.error('Token inválido ou expirado:', data.message);
+	alert('Sua sessão expirou. Faça login novamente.');
+	window.location.href = 'index.html'; // Redireciona para a página de login
+	}
+})
+.catch((error) => {
+	console.error('Erro ao validar token:', error);
+});
 async function enviaProduto(event) {
 		event.preventDefault(); // Impede o envio padrão do formulário
 

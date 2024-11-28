@@ -24,8 +24,19 @@
     </div>
 
     <script>
-        // Redireciona para index.html após 3 segundos
-        setTimeout(() => {
+        fetch('http://127.0.0.1:3333/logout', {
+        method: 'POST',
+        credentials: 'include', // Envia cookies junto com a requisição
+        })
+        .then(() => {
+            console.log('Logout realizado com sucesso no servidor.');
+        })
+        .catch((error) => {
+            console.error('Erro ao realizar logout:', error);
+        });
+
+        // Redireciona para a página inicial após 3 segundos
+            setTimeout(() => {
             window.location.href = 'index.html';
         }, 3000);
     </script>

@@ -51,6 +51,25 @@
         </div>
     </div>
     <script>
+
+        fetch('http://127.0.0.1:3333/validarToken', {
+            method: 'POST',
+            credentials: 'include', // Garante que cookies sejam enviados na requisição
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.valid) {
+            console.log('Token válido:', data.decoded);
+            } else {
+            console.error('Token inválido ou expirado:', data.message);
+            alert('Sua sessão expirou. Faça login novamente.');
+            window.location.href = 'index.html'; // Redireciona para a página de login
+            }
+        })
+        .catch((error) => {
+            console.error('Erro ao validar token:', error);
+        });
+
         document.getElementById('addProductForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
